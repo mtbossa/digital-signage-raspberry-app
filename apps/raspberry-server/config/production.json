@@ -1,4 +1,4 @@
 {
-  "host": "intus-feathersjs-server-app.feathersjs.com",
-  "port": "PORT"
+  "serverCheckTimeout": 60000,
+  "showcaseCheckTimeout": 10000
 }
