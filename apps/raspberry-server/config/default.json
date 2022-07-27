@@ -1,0 +1,16 @@
+{
+  "host": "localhost",
+  "port": 3030,
+  "public": "../public/",
+  "medias": "../public/medias",
+  "paginate": {
+    "default": 10,
+    "max": 50
+  },
+  "serverCheckTimeout": 5000,
+  "showcaseCheckTimeout": 5000,
+  "mongodb": "mongodb://localhost:27017",
+  "raspberryId": "RASPBERRY_ID",
+  "apiUrl": "API_URL",
+  "raspberryAPIToken": "RASPBERRY_API_TOKEN"
+}
