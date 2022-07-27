@@ -1,5 +1,7 @@
 import path from "path";
-import favicon from "serve-favicon";
+
+process.env["NODE_CONFIG_DIR"] = path.join(__dirname, "../", "config/");
+
 import compress from "compression";
 import helmet from "helmet";
 import cors from "cors";
@@ -21,16 +23,16 @@ import mongoose from "./mongoose";
 
 const app: Application = express(feathers());
 export type HookContext<T = any> = {
-  app: Application;
+	app: Application;
 } & FeathersHookContext<T>;
 
 // Load app configuration
 app.configure(configuration());
 // Enable security, CORS, compression, favicon and body parsing
 app.use(
-  helmet({
-    contentSecurityPolicy: false,
-  })
+	helmet({
+		contentSecurityPolicy: false,
+	})
 );
 app.use(cors());
 app.use(compress());
