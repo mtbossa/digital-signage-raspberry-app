@@ -36,43 +36,51 @@ export class Posts extends Service<Post> {
   public async sync() {
     console.log("[ SYNCING POSTS ]");
 
-    const posts: APIPost[] = await this.intusAPI.fetchRaspberryPosts();
-    const medias: Media[] = posts.map((post) => post.media);
+    try {
+      const posts: APIPost[] = await this.intusAPI.fetchRaspberryPosts();
+      const medias: Media[] = posts.map((post) => post.media);
 
-    const mediasFiltered: Media[] = this.removeDuplicateMedias(medias);
+      const mediasFiltered: Media[] = this.removeDuplicateMedias(medias);
 
-    const mediasFilteredWithPosts = mediasFiltered.map((media: Media) => {
-      const postsFromThisMedia = posts.filter(
-        (post) => post.media.id === media.id
-      );
+      const mediasFilteredWithPosts = mediasFiltered.map((media: Media) => {
+        const postsFromThisMedia = posts.filter(
+          (post) => post.media.id === media.id
+        );
 
-      return {
-        ...media,
-        posts: postsFromThisMedia,
-      };
-    });
+        return {
+          ...media,
+          posts: postsFromThisMedia,
+        };
+      });
 
-    // TODO filter response and log the rejected ones
-    const res = await Promise.allSettled(
-      mediasFilteredWithPosts.map(async (media) => {
-        // Checks if media already exists, if doesn't, will throw error NotFound and we'll create it.
-        // Otherwise, update it so can create any new posts.
-        try {
-          const foundMedia = await this.mediasService.get(media.id);
-          return this.mediasService.update(foundMedia._id, {
-            ...foundMedia,
-            posts: media.posts,
-          });
-        } catch (e) {
-          if (e instanceof NotFound) {
-            return this.mediasService.create({
-              ...MediaAdapter.fromAPIToLocal(media),
+      // TODO filter response and log the rejected ones
+      const res = await Promise.allSettled(
+        mediasFilteredWithPosts.map(async (media) => {
+          // Checks if media already exists, if doesn't, will throw error NotFound and we'll create it.
+          // Otherwise, update it so can create any new posts.
+          try {
+            const foundMedia = await this.mediasService.get(media.id);
+            return this.mediasService.update(foundMedia._id, {
+              ...foundMedia,
               posts: media.posts,
             });
+          } catch (e) {
+            if (e instanceof NotFound) {
+              return this.mediasService.create({
+                ...MediaAdapter.fromAPIToLocal(media),
+                posts: media.posts,
+              });
+            }
           }
-        }
-      })
-    );
+        })
+      );
+    } catch (e) {
+      console.log("[ SYNC FINISH WITH ERROR ]");
+
+      this.app.service("posts").emit("sync-finish", { status: "finish" });
+
+      throw e;
+    }
 
     console.log("[ SYNC FINISH ]");
 

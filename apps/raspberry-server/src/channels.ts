@@ -32,9 +32,8 @@ export default function (app: Application): void {
     // When initializing the system, checks connection so when frontend is connected
     // we already know if we have internet connection or not
     try {
-      await serverStatusCheckerService.check();
-      await serverStatusCheckerService.connectToChannels();
       await postsService.sync();
+      await serverStatusCheckerService.connectToChannels();
     } catch (e) {
       if (e instanceof Error) {
         console.error("Error while initial syncing: ", e.message);
