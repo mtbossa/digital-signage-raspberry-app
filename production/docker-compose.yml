@@ -26,3 +26,7 @@ services:
             - 'intus-mongodb:/db/data'
 volumes:
     intus-mongodb:
+networks:
+    default:
+        name: intus-backend_sail
+        external: true

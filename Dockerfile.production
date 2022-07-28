@@ -1,8 +1,6 @@
 FROM node:16
 
-ENV API_URL="localhost:80"
 ENV PORT=3030
-ENV NODE_ENV="production"
 
 RUN mkdir -p /intus/app /intus/public /intus/public/medias /intus/config
 
