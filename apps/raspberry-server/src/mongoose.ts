@@ -4,7 +4,6 @@ import logger from "./logger";
 
 export default function (app: Application): void {
 	const dbHost = app.get("dbHost");
-	const dbPort = app.get("dbPort");
 	const dbUser = app.get("dbUser");
 	const dbPassword = app.get("dbPassword");
 	const dbName = app.get("dbName");
@@ -14,7 +13,7 @@ export default function (app: Application): void {
 		dbUrl = dbUrl + `${dbUser}:${dbPassword}@`;
 	}
 
-	dbUrl = dbUrl + `${dbHost}:${dbPort}`;
+	dbUrl = dbUrl + `${dbHost}:27017`;
 
 	if (dbName) {
 		dbUrl = dbUrl + `/${dbName}`;
