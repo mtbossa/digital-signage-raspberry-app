@@ -1,0 +1,13 @@
+FROM node:16
+
+ENV PORT=3030
+
+RUN mkdir -p /intus/app /intus/public /intus/public/medias /intus/config
+
+COPY apps/raspberry-server/build /intus/app
+COPY apps/raspberry-frontend/build /intus/public
+COPY apps/raspberry-server/config /intus/config
+
+CMD ["node", "/intus/app/index.js"]
+
+EXPOSE $PORT
