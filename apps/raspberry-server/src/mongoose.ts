@@ -16,7 +16,7 @@ export default function (app: Application): void {
 	dbUrl = dbUrl + `${dbHost}:27017`;
 
 	if (dbName) {
-		dbUrl = dbUrl + `/${dbName}`;
+		dbUrl = dbUrl + `/${dbName}?authSource=admin`;
 	}
 
 	mongoose.connect(dbUrl).catch(err => {
