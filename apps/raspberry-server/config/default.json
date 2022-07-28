@@ -9,7 +9,11 @@
   },
   "serverCheckTimeout": 5000,
   "showcaseCheckTimeout": 5000,
-  "mongodb": "mongodb://localhost:27017",
+  "dbHost": "DB_HOST",
+  "dbPort": "DB_PORT",
+  "dbUser": "DB_USER",
+  "dbPassword": "DB_PASSWORD",
+  "dbName": "DB_NAME",
   "raspberryId": "RASPBERRY_ID",
   "apiUrl": "API_URL",
   "raspberryAPIToken": "RASPBERRY_API_TOKEN"

@@ -1,0 +1,7 @@
+{
+  "dbHost": "DB_HOST",
+  "dbPort": "DB_PORT",
+  "dbUser": null,
+  "dbPassword": null,
+  "dbName": null
+}
