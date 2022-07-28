@@ -1,11 +1,10 @@
 FROM node:16
 
 ENV API_URL="localhost:80"
-ENV PORT=4508
+ENV PORT=3030
 ENV NODE_ENV="production"
 
-RUN mkdir /intus
-RUN mkdir /app /public /config
+RUN mkdir -p /intus/app /intus/public /intus/public/medias /intus/config
 
 COPY apps/raspberry-server/build /intus/app
 COPY apps/raspberry-frontend/build /intus/public
