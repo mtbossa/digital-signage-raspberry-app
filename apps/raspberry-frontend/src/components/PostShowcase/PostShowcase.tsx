@@ -16,10 +16,6 @@ interface PostShowcaseProps {
 	isLoading: boolean;
 }
 
-function getLastIndex(array: Array<any>) {
-	return array.length - 1;
-}
-
 export default function PostShowcase({
 	latestPosts,
 	deletablePosts,
@@ -40,6 +36,7 @@ export default function PostShowcase({
 
 	const [currentPostIndex, setCurrentPostIndex] = useState<number>(0);
 
+	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
 		if (!showingPost || Object.keys(showingPost).length === 0) return;
 

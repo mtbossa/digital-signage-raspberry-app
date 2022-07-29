@@ -11,9 +11,10 @@ export default function Image({
 	displayWidth,
 	displayHeight,
 }: ImageProps) {
+	/* eslint-disable jsx-a11y/alt-text */
 	return (
 		<img
-			src={`http://localhost:3030/medias/${showingPost.media.path}`}
+			src={`http://localhost:3030/medias/${showingPost.media.path}`} 
 			width={displayWidth}
 			height={displayHeight}
 			crossOrigin="anonymous"

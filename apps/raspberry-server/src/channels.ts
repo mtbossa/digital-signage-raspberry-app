@@ -2,16 +2,9 @@ import "@feathersjs/transport-commons";
 import { HookContext } from "@feathersjs/feathers";
 import { Application } from "./declarations";
 
-import intusAPI, {
+import {
   ClientRequestError,
-  Media,
-  Post,
 } from "./clients/intusAPI/intusAPI";
-import MediaAdapter from "./clients/intusAPI/adapters/media-adapter";
-import { NotFound } from "@feathersjs/errors";
-import { ShowcaseChecker } from "./services/showcase-checker/showcase-checker.class";
-import { ServerStatusChecker } from "./services/server-status-checker/server-status-checker.class";
-import { Posts } from "./services/posts/posts.class";
 
 export default function (app: Application): void {
   if (typeof app.channel !== "function") {
