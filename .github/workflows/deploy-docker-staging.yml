@@ -1,7 +1,7 @@
 name: Build Docker staging image
 on:
   push:
-    branches: ["staging"]
+    branches: ["main", "staging"]
 jobs:
   build:
     name: Build and push to Docker Hub
@@ -10,6 +10,19 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+
+      # This step is run when the branch is production
+      - name: Sets env vars for production
+        run: |
+          echo "DOCKER_IMAGE_NAME=mtbossa/raspberry-prod:latest" >> $GITHUB_ENV
+        if: github.ref_name === "main"
+
+      # This step is run when the branch is staging
+      - name: Sets env vars for staging
+        run: |
+          echo "DOCKER_IMAGE_NAME=mtbossa/raspberry-prod:staging" >> $GITHUB_ENV
+        if: github.ref_name === "staging"
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
@@ -33,5 +46,5 @@ jobs:
         with:
           push: true
           context: .
-          tags: mtbossa/raspberry-prod:staging
+          tags: ${{env.DOCKER_IMAGE_NAME}}
           file: Dockerfile.production
