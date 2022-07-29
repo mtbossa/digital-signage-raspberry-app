@@ -15,13 +15,13 @@ jobs:
       - name: Sets env vars for production
         run: |
           echo "DOCKER_IMAGE_NAME=mtbossa/raspberry-prod:latest" >> $GITHUB_ENV
-        if: github.ref_name === "main"
+        if: github.ref_name == "main"
 
       # This step is run when the branch is staging
       - name: Sets env vars for staging
         run: |
           echo "DOCKER_IMAGE_NAME=mtbossa/raspberry-prod:staging" >> $GITHUB_ENV
-        if: github.ref_name === "staging"
+        if: github.ref_name == "staging"
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
