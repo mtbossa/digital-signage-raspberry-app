@@ -2,6 +2,14 @@ name: Build Docker staging image
 on:
   push:
     branches: ["main", "staging"]
+    paths:
+      [
+        "apps/**/src/**",
+        "apps/**/config/default.json",
+        "apps/**/config/production.json",
+        "apps/**/config/staging.json",
+        "Dockerfile.production",
+      ]
 jobs:
   build:
     name: Build and push to Docker Hub
