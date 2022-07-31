@@ -26,8 +26,6 @@ interface Notification {
 }
 
 export class Displays extends Service<Display> {
-	private displaysService: Displays;
-
 	//eslint-disable-next-line @typescript-eslint/no-unused-vars
 	constructor(
 		options: Partial<MongooseServiceOptions>,
@@ -35,8 +33,6 @@ export class Displays extends Service<Display> {
 		private intusAPI: IntusAPI = new IntusAPI()
 	) {
 		super(options);
-
-		this.displaysService = this.app.service("displays");
 	}
 
 	public async sync() {
@@ -177,6 +173,7 @@ export class Displays extends Service<Display> {
 			this.app.channel("anonymous").join(connection);
 
 			await this.app.service("posts").sync(display);
+			await this.connectToLaravelChannels(display);
 
 			return { connected: true };
 		} catch (e) {
