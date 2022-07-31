@@ -105,15 +105,12 @@ export class IntusAPI {
 		}
 	}
 
-	public async fetchRaspberryPosts(
-		displayId: number,
-		displayApiToken: string
-	): Promise<Post[]> {
+	public async fetchDisplayPosts(displayId: number): Promise<Post[]> {
 		try {
 			const response = await this.request.get<PostResponse>(
-				`${this.apiUrl}/api/raspberry/${displayId}/posts`,
+				`${this.apiUrl}/api/displays/${displayId}/posts`,
 				{
-					headers: { Authorization: `Bearer ${displayApiToken}` },
+					headers: { Authorization: `Bearer ${this.storeApiToken}` },
 				}
 			);
 

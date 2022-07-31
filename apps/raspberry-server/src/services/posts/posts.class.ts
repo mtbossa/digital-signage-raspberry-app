@@ -45,9 +45,8 @@ export class Posts extends Service<Post> {
 		console.log(`[ SYNCING POSTS FROM DISPLAY ${display._id} ]`);
 
 		try {
-			const posts: APIPost[] = await this.intusAPI.fetchRaspberryPosts(
-				display._id,
-				display.apiToken
+			const posts: APIPost[] = await this.intusAPI.fetchDisplayPosts(
+				display._id
 			);
 			const medias: Media[] = posts.map(post => post.media);
 
