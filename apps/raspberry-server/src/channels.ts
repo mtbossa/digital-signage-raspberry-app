@@ -85,6 +85,10 @@ export default function (app: Application): void {
 	// app.service('users').publish('created', () => app.channel('admins'));
 
 	// Since syncing is global, can emit to all channels/displays
+	app.service("displays").publish("displays-sync-finish", (data: any) => {
+		return app.channel("anonymous");
+	});
+	// Since syncing is global, can emit to all channels/displays
 	app.service("posts").publish("sync-finish", (data: any) => {
 		return app.channel("anonymous");
 	});
