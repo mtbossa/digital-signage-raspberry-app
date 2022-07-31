@@ -5,15 +5,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
-      "port": 9229,
-      "request": "attach",
-      "name": "Attach Program",
-      "sourceMaps": true,
-      "restart": true,
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "type": "pwa-msedge",
+      "request": "launch",
+      "name": "Launch Edge against localhost",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}"
     }
   ]
 }
