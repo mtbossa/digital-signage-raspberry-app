@@ -1,9 +1,12 @@
 import logger from "./logger";
 import app from "./app";
-import intusAPI from "./clients/intusAPI/intusAPI";
+import { ClientRequestError } from "./clients/intusAPI/intusAPI";
 
 const port = app.get("port");
 const server = app.listen(port);
+
+const displaysService = app.service("displays");
+const serverStatusCheckerService = app.service("server-status-checker");
 
 process.on("unhandledRejection", (reason, p) =>
 	logger.error("Unhandled Rejection at: Promise ", p, reason)
@@ -16,8 +19,23 @@ server.on("listening", async () => {
 		port
 	);
 
+	// When initializing the system, checks connection so when frontend is connected
+	// we already know if we have internet connection or not
 	try {
-		const res = await intusAPI.fetchStoreDisplays();
-		const test = res;
-	} catch {}
+		await displaysService.sync();
+	} catch (e) {
+		if (e instanceof Error) {
+			console.error("Error while initial syncing: ", e.message);
+		}
+		if (e instanceof ClientRequestError) {
+			console.log("[ SERVER DOWN WHILE SYNCING ]");
+
+			await serverStatusCheckerService.patch(null, {
+				...serverStatusCheckerService.status,
+				server: "down",
+			});
+		}
+	}
+
+	serverStatusCheckerService.start();
 });
