@@ -33,7 +33,7 @@ export class Posts extends Service<Post> {
     );
   }
 
-  public async sync() {
+  public async sync(displayId: number) {
     console.log("[ SYNCING POSTS ]");
 
     try {

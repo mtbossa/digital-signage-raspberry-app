@@ -18,6 +18,13 @@ export interface Media {
 }
 
 const postsService = client.service("posts");
+const displayConnectService = client.service("display-connect");
+
+const getDisplayIdFromUrlPath = (pathname: string): number => {
+	const afterLastSlash = pathname.substring(pathname.lastIndexOf("/") + 1);
+
+	return Number(afterLastSlash);
+};
 
 function App() {
 	const [deletablePosts, setDeletablePosts] = useState<Post[]>([]);
@@ -25,12 +32,15 @@ function App() {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	const setupWebSocket = useCallback(() => {
+		displayConnectService.create({ displayId: getDisplayIdFromUrlPath(window.location.pathname) });
+
 		postsService.on("sync-finish", (data: { status: "finish" | "failed" }) => {
 			console.log("sync-finish");
 			setIsLoading(false);
 		});
 
 		postsService.on("start-post", (post: Post) => {
+			console.log("starting-post");
 			setCurrentPosts(currentPosts => {
 				return [...currentPosts!, post];
 			});
