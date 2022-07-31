@@ -13,6 +13,7 @@ export interface Display {
 	height: number;
 	touch: boolean;
 	apiToken: string;
+	channelsConnected: boolean;
 }
 
 export default function (app: Application): Model<Display> {
@@ -28,6 +29,7 @@ export default function (app: Application): Model<Display> {
 			height: { type: Number, required: true },
 			touch: { type: Boolean, required: true },
 			apiToken: { type: String, required: true },
+			channelsConnected: { type: Boolean, default: false },
 		},
 		{
 			timestamps: true,

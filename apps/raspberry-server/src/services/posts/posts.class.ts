@@ -3,17 +3,23 @@ import { Params } from "@feathersjs/feathers";
 import { Service, MongooseServiceOptions } from "feathers-mongoose";
 import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
 import {
+	ClientRequestError,
 	IntusAPI,
 	Media,
 	Post as APIPost,
 } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
+import { Display } from "../../models/displays.model";
 import { Post } from "../../models/posts.model";
 import { Medias } from "../medias/medias.class";
+import { ServerStatusChecker } from "../server-status-checker/server-status-checker.class";
+import { ShowcaseChecker } from "../showcase-checker/showcase-checker.class";
 
 // A type interface for our user (it does not validate any data)
 export class Posts extends Service<Post> {
 	private mediasService: Medias;
+	private showcaseChecker: ShowcaseChecker;
+	private serverStatusCheckerService: ServerStatusChecker;
 
 	//eslint-disable-next-line @typescript-eslint/no-unused-vars
 	constructor(
@@ -24,6 +30,8 @@ export class Posts extends Service<Post> {
 		super(options);
 
 		this.mediasService = this.app.service("medias");
+		this.showcaseChecker = this.app.service("showcase-checker");
+		this.serverStatusCheckerService = this.app.service("server-status-checker");
 	}
 
 	private removeDuplicateMedias(medias: Media[]): Media[] {
@@ -33,11 +41,14 @@ export class Posts extends Service<Post> {
 		);
 	}
 
-	public async sync() {
-		console.log("[ SYNCING POSTS ]");
+	public async sync(display: Display) {
+		console.log(`[ SYNCING POSTS FROM DISPLAY ${display._id} ]`);
 
 		try {
-			const posts: APIPost[] = await this.intusAPI.fetchRaspberryPosts();
+			const posts: APIPost[] = await this.intusAPI.fetchRaspberryPosts(
+				display._id,
+				display.apiToken
+			);
 			const medias: Media[] = posts.map(post => post.media);
 
 			const mediasFiltered: Media[] = this.removeDuplicateMedias(medias);
@@ -75,14 +86,30 @@ export class Posts extends Service<Post> {
 				})
 			);
 		} catch (e) {
-			console.log("[ SYNC FINISH WITH ERROR ]");
-
 			this.app.service("posts").emit("sync-finish", { status: "finish" });
+
+			console.log(
+				`[ SYNC POSTS FROM DISPLAY ${display._id} FINISH WITH ERROR ]`
+			);
+			console.error(`Error while syncing display ${display._id}: `, e);
+
+			if (e instanceof ClientRequestError) {
+				console.log(`[ SERVER DOWN WHILE SYNCING DISPLAY ${display._id}]`);
+
+				await this.serverStatusCheckerService.patch(null, {
+					...this.serverStatusCheckerService.status,
+					server: "down",
+				});
+
+				this.showcaseChecker.start();
+
+				return;
+			}
 
 			throw e;
 		}
 
-		console.log("[ SYNC FINISH ]");
+		console.log(`[ SYNC POSTS FROM DISPLAY ${display._id} FINISH ]`);
 
 		this.app.service("posts").emit("sync-finish", { status: "finish" });
 	}

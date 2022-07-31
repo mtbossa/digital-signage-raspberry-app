@@ -16,32 +16,8 @@ export default function (app: Application): void {
 
 	app.on("connection", async (connection: any): Promise<void> => {
 		// On a new real-time connection, add it to the anonymous channel
-		console.log("[ FRONTEND CONNECTED ]");
 
 		app.channel("anonymous").join(connection);
-
-		// When initializing the system, checks connection so when frontend is connected
-		// we already know if we have internet connection or not
-		try {
-			await postsService.sync();
-			await serverStatusCheckerService.connectToChannels();
-		} catch (e) {
-			if (e instanceof Error) {
-				console.error("Error while initial syncing: ", e.message);
-			}
-			if (e instanceof ClientRequestError) {
-				console.log("[ SERVER DOWN WHILE SYNCING ]");
-
-				await serverStatusCheckerService.patch(null, {
-					...serverStatusCheckerService.status,
-					server: "down",
-				});
-
-				showcaseChecker.start();
-			}
-		}
-
-		serverStatusCheckerService.start();
 	});
 
 	app.on("login", (authResult: any, { connection }: any): void => {
@@ -90,7 +66,7 @@ export default function (app: Application): void {
 	});
 	// Since syncing is global, can emit to all channels/displays
 	app.service("posts").publish("sync-finish", (data: any) => {
-		return app.channel("anonymous");
+		return [app.channel(`display/1`), app.channel(`display/2`)];
 	});
 	app.service("posts").publish("start-post", (data: any) => {
 		return [app.channel(`display/1`), app.channel(`display/2`)];
