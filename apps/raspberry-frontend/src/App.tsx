@@ -18,7 +18,7 @@ export interface Media {
 }
 
 const postsService = client.service("posts");
-const displayConnectService = client.service("display-connect");
+const displaysService = client.service("displays");
 
 const getDisplayIdFromUrlPath = (pathname: string): number => {
 	const afterLastSlash = pathname.substring(pathname.lastIndexOf("/") + 1);
@@ -32,25 +32,35 @@ function App() {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	const setupWebSocket = useCallback(() => {
-		displayConnectService.create({ displayId: getDisplayIdFromUrlPath(window.location.pathname) });
+		displaysService.on(
+			"displays-sync-finish",
+			(data: { status: "finish" | "failed" }) => {
+				displaysService.connect({
+					displayId: getDisplayIdFromUrlPath(window.location.pathname),
+				});
 
-		postsService.on("sync-finish", (data: { status: "finish" | "failed" }) => {
-			console.log("sync-finish");
-			setIsLoading(false);
-		});
+				postsService.on(
+					"sync-finish",
+					(data: { status: "finish" | "failed" }) => {
+						console.log("sync-finish");
+						setIsLoading(false);
+					}
+				);
 
-		postsService.on("start-post", (post: Post) => {
-			console.log("starting-post");
-			setCurrentPosts(currentPosts => {
-				return [...currentPosts!, post];
-			});
-		});
+				postsService.on("start-post", (post: Post) => {
+					console.log("starting-post");
+					setCurrentPosts(currentPosts => {
+						return [...currentPosts!, post];
+					});
+				});
 
-		postsService.on("end-post", (removedPost: Post) => {
-			setDeletablePosts(currentDeletablePosts => {
-				return [...currentDeletablePosts, removedPost];
-			});
-		});
+				postsService.on("end-post", (removedPost: Post) => {
+					setDeletablePosts(currentDeletablePosts => {
+						return [...currentDeletablePosts, removedPost];
+					});
+				});
+			}
+		);
 	}, []);
 
 	useEffect(() => {

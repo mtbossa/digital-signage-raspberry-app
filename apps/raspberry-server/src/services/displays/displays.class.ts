@@ -70,7 +70,7 @@ export class Displays extends Service<Display> {
 
 			this.app
 				.service("displays")
-				.emit("displays-sync-finish", { status: "finish" });
+				.emit("displays-sync-finish", { status: "failed" });
 
 			throw e;
 		}
