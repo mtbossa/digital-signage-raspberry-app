@@ -33,6 +33,14 @@ export interface Media {
 	type: string;
 	filename: string;
 }
+export interface Display {
+	id: number;
+	name: string;
+	size: number;
+	width: number;
+	height: number;
+	touch: boolean;
+}
 
 export class ClientRequestError extends InternalError {
 	constructor(message: string) {
@@ -50,6 +58,8 @@ export class IntusAPIResponseError extends InternalError {
 
 export class IntusAPI {
 	readonly raspberryId = process.env["RASPBERRY_ID"];
+	readonly storeId = process.env["STORE_ID"];
+	readonly storeApiToken = process.env["STORE_API_TOKEN"];
 	readonly apiToken = process.env["RASPBERRY_API_TOKEN"];
 	readonly apiUrl = process.env["API_URL"];
 
@@ -66,7 +76,7 @@ export class IntusAPI {
 			const response = await this.request.get<Stream>(
 				`${this.apiUrl}/api/media/${filename}/download`,
 				{
-					headers: { Authorization: `Bearer ${this.apiToken}` },
+					headers: { Authorization: `Bearer ${this.storeApiToken}` },
 					responseType: "stream",
 				}
 			);
@@ -95,16 +105,38 @@ export class IntusAPI {
 		}
 	}
 
-	public async fetchRaspberryPosts(): Promise<Post[]> {
+	public async fetchDisplayPosts(displayId: number): Promise<Post[]> {
 		try {
 			const response = await this.request.get<PostResponse>(
-				`${this.apiUrl}/api/raspberry/${this.raspberryId}/posts`,
+				`${this.apiUrl}/api/displays/${displayId}/posts`,
 				{
-					headers: { Authorization: `Bearer ${this.apiToken}` },
+					headers: { Authorization: `Bearer ${this.storeApiToken}` },
 				}
 			);
 
 			return response.data.data;
+		} catch (err: unknown) {
+			if (err instanceof Error && HTTPUtil.Request.isRequestError(err)) {
+				const error = HTTPUtil.Request.extractErrorData(err);
+				throw new IntusAPIResponseError(
+					`Error: ${JSON.stringify(error.data)} Code: ${error.status}`
+				);
+			}
+			// Non server (api) errors will fallback to a generic client error
+			throw new ClientRequestError(JSON.stringify(err));
+		}
+	}
+
+	public async fetchStoreDisplays(): Promise<Display[]> {
+		try {
+			const response = await this.request.get<Display[]>(
+				`${this.apiUrl}/api/stores/${this.storeId}/displays`,
+				{
+					headers: { Authorization: `Bearer ${this.storeApiToken}` },
+				}
+			);
+
+			return response.data;
 		} catch (err: unknown) {
 			if (err instanceof Error && HTTPUtil.Request.isRequestError(err)) {
 				const error = HTTPUtil.Request.extractErrorData(err);
