@@ -84,6 +84,7 @@ export class Posts extends Service<Data> {
 							return this.mediasService.create({
 								...MediaAdapter.fromAPIToLocal(media),
 								posts: media.posts,
+								display: display,
 							});
 						}
 					}
