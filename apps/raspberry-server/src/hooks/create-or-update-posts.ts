@@ -16,7 +16,7 @@ export default (options = {}): Hook => {
 		const posts: Post[] = media.posts;
 		const currentDisplay: Display = media.display;
 
-		const res = await Promise.allSettled(
+		await Promise.allSettled(
 			posts.map(async (post: Post) => {
 				try {
 					const foundPost = await postsService.get(post.id);
