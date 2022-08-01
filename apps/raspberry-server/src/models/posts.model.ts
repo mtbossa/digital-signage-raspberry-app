@@ -5,10 +5,14 @@
 import { Application } from "../declarations";
 import { Model, Mongoose } from "mongoose";
 
+export interface PostDisplay {
+	_id: number;
+	showing: boolean;
+}
 export interface Post {
 	_id: number;
 	mediaId: number;
-	displays: Array<{ _id: number; showing: boolean }>;
+	displays: Array<PostDisplay>;
 	startTime: string;
 	endTime: string;
 	showing: boolean;
