@@ -22,6 +22,7 @@ server.on("listening", async () => {
 	// When initializing the system, checks connection so when frontend is connected
 	// we already know if we have internet connection or not
 	try {
+		await displaysService.setAllDisplaysDisconnectedFromLaravel();
 		await displaysService.sync();
 	} catch (e) {
 		if (e instanceof Error) {

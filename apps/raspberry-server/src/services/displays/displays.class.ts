@@ -33,6 +33,19 @@ export class Displays extends Service<Display> {
 		private intusAPI: IntusAPI = new IntusAPI()
 	) {
 		super(options);
+	public async setAllDisplaysDisconnectedFromLaravel() {
+		const displays = (await super.find({
+			paginate: false,
+		})) as Array<Display>;
+
+		return Promise.allSettled(
+			displays.map(async (display: Display) =>
+				super.patch(display._id, {
+					...display,
+					channelsConnected: false,
+				})
+			)
+		);
 	}
 
 	public async sync() {
