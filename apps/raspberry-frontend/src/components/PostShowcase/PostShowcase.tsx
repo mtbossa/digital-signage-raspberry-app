@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Post } from "../../App";
+import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
 import Image from "../Image";
 import Loading from "../Loading";
 import NoPost from "../NoPost";
@@ -7,17 +7,13 @@ import Video from "../Video";
 import "./PostShowcase.css";
 
 interface PostShowcaseProps {
-	latestPosts: Post[];
-	updatePosts: (filteredPosts: Post[]) => void;
+	latestPosts: PostFrontendEvent[];
+	updatePosts: (filteredPosts: PostFrontendEvent[]) => void;
 	clearDeletablePosts: () => void;
-	deletablePosts: Post[];
+	deletablePosts: PostFrontendEvent[];
 	displayWidth: number;
 	displayHeight: number;
 	isLoading: boolean;
-}
-
-function getLastIndex(array: Array<any>) {
-	return array.length - 1;
 }
 
 export default function PostShowcase({
@@ -36,10 +32,13 @@ export default function PostShowcase({
 	const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
 	// Current post being showed on the screen
-	const [showingPost, setShowingPost] = useState<Post | null>(null);
+	const [showingPost, setShowingPost] = useState<PostFrontendEvent | null>(
+		null
+	);
 
 	const [currentPostIndex, setCurrentPostIndex] = useState<number>(0);
 
+	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
 		if (!showingPost || Object.keys(showingPost).length === 0) return;
 
@@ -61,7 +60,7 @@ export default function PostShowcase({
 			if (deletablePosts.length > 0) {
 				const postsWithoutDeleted = latestPosts.filter(post => {
 					return deletablePosts.find(
-						(deletedPost: Post) => post._id !== deletedPost._id
+						(deletedPost: PostFrontendEvent) => post._id !== deletedPost._id
 					);
 				});
 				updatePosts(postsWithoutDeleted);
@@ -80,7 +79,7 @@ export default function PostShowcase({
 		setIsPlaying(false);
 	}
 
-	function getNextPost(post: Post | null): Post {
+	function getNextPost(post: PostFrontendEvent | null): PostFrontendEvent {
 		if (!post) {
 			return latestPosts[0];
 		}
@@ -110,21 +109,13 @@ export default function PostShowcase({
 	}
 
 	if (showingPost.media.type === "image") {
-		return (
-			<Image
-				showingPost={showingPost}
-				displayWidth={displayWidth}
-				displayHeight={displayHeight}
-			/>
-		);
+		return <Image showingPost={showingPost} />;
 	}
 
 	return (
 		<Video
 			ref={videoRef}
 			showingPost={showingPost}
-			displayWidth={displayWidth}
-			displayHeight={displayHeight}
 			onVideoEnded={handleOnVideoEnded}
 		/>
 	);
