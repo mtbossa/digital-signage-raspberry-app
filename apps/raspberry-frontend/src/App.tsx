@@ -14,7 +14,7 @@ const displayConnectService: DisplayConnect & ServiceAddons<Posts> =
 	client.service("display-connect");
 
 const getDisplayIdFromUrlPath = (pathname: string): number => {
-	const afterLastSlash = pathname.substring(pathname.lastIndexOf("/") + 1);
+	const afterLastSlash = pathname.split('/')[1];
 
 	return Number(afterLastSlash);
 };
