@@ -9,6 +9,7 @@ export interface Post {
 	_id: number;
 	exposeTime?: number;
 	media: Media;
+	currentDisplayId: number;
 }
 
 export interface Media {
@@ -26,6 +27,26 @@ const getDisplayIdFromUrlPath = (pathname: string): number => {
 	return Number(afterLastSlash);
 };
 
+const updateDisplayPost = async (
+	post: Post,
+	updatedValues: { showing?: boolean }
+) => {
+	const postDb = await postsService.get(post._id);
+
+	const updatedDisplays = postDb.displays.map(
+		(display: { _id: number; showing: boolean }) => {
+			if (display._id !== post.currentDisplayId) return display;
+
+			return { ...display, ...updatedValues };
+		}
+	);
+
+	await postsService.patch(postDb._id, {
+		...postDb,
+		displays: updatedDisplays,
+	});
+};
+
 function App() {
 	const [deletablePosts, setDeletablePosts] = useState<Post[]>([]);
 	const [currentPosts, setCurrentPosts] = useState<Post[]>([]);
@@ -41,18 +62,23 @@ function App() {
 			setIsLoading(false);
 		});
 
-		postsService.on("start-post", (post: Post) => {
-			console.log("starting-post");
+		postsService.on("start-post", async (post: Post) => {
 			setIsLoading(false);
 			setCurrentPosts(currentPosts => {
 				return [...currentPosts!, post];
 			});
+			updateDisplayPost(post, {
+				showing: true,
+			});
 		});
 
-		postsService.on("end-post", (removedPost: Post) => {
+		postsService.on("end-post", async (removedPost: Post) => {
 			setIsLoading(false);
 			setDeletablePosts(currentDeletablePosts => {
 				return [...currentDeletablePosts, removedPost];
+			});
+			updateDisplayPost(removedPost, {
+				showing: false,
 			});
 		});
 	}, []);
