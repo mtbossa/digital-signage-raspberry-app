@@ -9,6 +9,7 @@ export interface Post {
 	_id: number;
 	exposeTime?: number;
 	media: Media;
+	currentDisplayId: number;
 }
 
 export interface Media {
@@ -18,27 +19,66 @@ export interface Media {
 }
 
 const postsService = client.service("posts");
+const displayConnectService = client.service("display-connect");
+
+const getDisplayIdFromUrlPath = (pathname: string): number => {
+	const afterLastSlash = pathname.substring(pathname.lastIndexOf("/") + 1);
+
+	return Number(afterLastSlash);
+};
+
+const updateDisplayPost = async (
+	post: Post,
+	updatedValues: { showing?: boolean }
+) => {
+	const postDb = await postsService.get(post._id);
+
+	const updatedDisplays = postDb.displays.map(
+		(display: { _id: number; showing: boolean }) => {
+			if (display._id !== post.currentDisplayId) return display;
+
+			return { ...display, ...updatedValues };
+		}
+	);
+
+	await postsService.patch(postDb._id, {
+		...postDb,
+		displays: updatedDisplays,
+	});
+};
 
 function App() {
 	const [deletablePosts, setDeletablePosts] = useState<Post[]>([]);
 	const [currentPosts, setCurrentPosts] = useState<Post[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
-	const setupWebSocket = useCallback(() => {
+	const setupWebSocket = useCallback(async () => {
+		displayConnectService.create({
+			displayId: getDisplayIdFromUrlPath(window.location.pathname),
+		});
+
 		postsService.on("sync-finish", (data: { status: "finish" | "failed" }) => {
 			console.log("sync-finish");
 			setIsLoading(false);
 		});
 
-		postsService.on("start-post", (post: Post) => {
+		postsService.on("start-post", async (post: Post) => {
+			setIsLoading(false);
 			setCurrentPosts(currentPosts => {
 				return [...currentPosts!, post];
 			});
+			updateDisplayPost(post, {
+				showing: true,
+			});
 		});
 
-		postsService.on("end-post", (removedPost: Post) => {
+		postsService.on("end-post", async (removedPost: Post) => {
+			setIsLoading(false);
 			setDeletablePosts(currentDeletablePosts => {
 				return [...currentDeletablePosts, removedPost];
+			});
+			updateDisplayPost(removedPost, {
+				showing: false,
 			});
 		});
 	}, []);
