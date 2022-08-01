@@ -5,7 +5,7 @@ services:
         image: mtbossa/raspberry-prod:latest
         restart: always
         ports:
-            - '3030:3030'
+            - '${PORT}:3030'
         env_file:
           - .env
         volumes:
