@@ -1,22 +1,14 @@
-import { Post } from "../../App";
+import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
 
 interface ImageProps {
-	showingPost: Post;
-	displayWidth: number;
-	displayHeight: number;
+	showingPost: PostFrontendEvent;
 }
 
-export default function Image({
-	showingPost,
-	displayWidth,
-	displayHeight,
-}: ImageProps) {
+export default function Image({ showingPost }: ImageProps) {
 	/* eslint-disable jsx-a11y/alt-text */
 	return (
 		<img
-			src={`http://localhost:3030/medias/${showingPost.media.path}`} 
-			width={displayWidth}
-			height={displayHeight}
+			src={`http://localhost:3030/medias/${showingPost.media.path}`}
 			crossOrigin="anonymous"
 		/>
 	);

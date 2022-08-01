@@ -6,7 +6,7 @@ import { ClientRequestError } from "./clients/intusAPI/intusAPI";
 import { Post } from "./models/posts.model";
 import { Media } from "./models/medias.model";
 
-type PostFrontendEvent = {
+export type PostFrontendEvent = {
 	_id: number;
 	exposeTime: number;
 	media: Media;
