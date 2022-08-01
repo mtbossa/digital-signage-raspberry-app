@@ -13,8 +13,9 @@ const postsService: Posts & ServiceAddons<Posts> = client.service("posts");
 const displayConnectService: DisplayConnect & ServiceAddons<Posts> =
 	client.service("display-connect");
 
+// Path will always be /displays/1..2..n
 const getDisplayIdFromUrlPath = (pathname: string): number => {
-	const afterLastSlash = pathname.split('/')[1];
+	const afterLastSlash = pathname.split("/")[2];
 
 	return Number(afterLastSlash);
 };
