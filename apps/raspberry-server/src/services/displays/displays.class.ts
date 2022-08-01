@@ -27,12 +27,20 @@ interface Notification {
 
 export class Displays extends Service<Display> {
 	//eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private storeAuthorizationToken: string;
+	private apiUrl: string;
+
 	constructor(
 		options: Partial<MongooseServiceOptions>,
 		private app: Application,
 		private intusAPI: IntusAPI = new IntusAPI()
 	) {
 		super(options);
+
+		this.storeAuthorizationToken = this.app.get("storeAPIToken");
+		this.apiUrl = this.app.get("apiUrl");
+	}
+
 	public async setAllDisplaysDisconnectedFromLaravel() {
 		const displays = (await super.find({
 			paginate: false,
@@ -98,19 +106,17 @@ export class Displays extends Service<Display> {
 
 		console.log(`[ CONNECTING DISPLAY ${display._id} TO LARAVEL CHANNELS ]`);
 
-		const authorizationToken: string = this.app.get("storeAPIToken");
-		const apiUrl: string = this.app.get("apiUrl");
-		const raspberryId: number = display._id;
 		const mediasService: Medias = this.app.service("medias");
+		const displayId: number = display._id;
 
 		const options: Options = {
-			authEndpoint: `${apiUrl}/api/broadcasting/auth`,
+			authEndpoint: `${this.apiUrl}/api/broadcasting/auth`,
 			forceTLS: true,
 			cluster: "sa1",
 			enabledTransports: ["ws", "wss"],
 			auth: {
 				headers: {
-					Authorization: `Bearer ${authorizationToken}`,
+					Authorization: `Bearer ${this.storeAuthorizationToken}`,
 				},
 			},
 		};
@@ -125,13 +131,13 @@ export class Displays extends Service<Display> {
 			auth: {
 				withCredentials: true,
 				headers: {
-					Authorization: `Bearer ${authorizationToken}`,
+					Authorization: `Bearer ${this.storeAuthorizationToken}`,
 				},
 			},
 		});
 
 		const channel: Channel = laravelEcho.private(
-			`App.Models.Raspberry.${raspberryId}`
+			`App.Models.Display.${displayId}`
 		);
 
 		channel.notification(async (notification: Notification) => {
@@ -149,12 +155,14 @@ export class Displays extends Service<Display> {
 						return mediasService.update(foundMedia._id, {
 							...foundMedia,
 							posts: [post],
+							display: display,
 						});
 					} catch (e) {
 						if (e instanceof NotFound) {
 							return mediasService.create({
 								...MediaAdapter.fromAPIToLocal(media),
 								posts: [post],
+								display: display,
 							});
 						}
 					}
