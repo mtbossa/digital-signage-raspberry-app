@@ -14,28 +14,36 @@ export default (options = {}): Hook => {
 		const postsService: Posts = context.app.service("posts");
 		const media: MediaData = context.data;
 		const posts: Post[] = media.posts;
-		const display: Display = media.display;
+		const currentDisplay: Display = media.display;
 
 		const res = await Promise.allSettled(
 			posts.map(async (post: Post) => {
 				try {
 					const foundPost = await postsService.get(post.id);
-					const displays = [
-						...foundPost.displays,
-						{ _id: display._id, showing: false },
-					];
+					let postDisplays = foundPost.displays;
+
+					const displaysAlreadyExists = postDisplays.find(
+						display => display._id === currentDisplay._id
+					);
+
+					if (!displaysAlreadyExists) {
+						postDisplays = [
+							...foundPost.displays,
+							{ _id: currentDisplay._id, showing: false },
+						];
+					}
 
 					return postsService.update(foundPost._id, {
 						...PostAdapter.fromAPIToLocal(post),
-						displays,
-						currentDisplay: { _id: display._id, showing: false },
+						displays: postDisplays,
+						currentDisplay: { _id: currentDisplay._id, showing: false },
 					});
 				} catch (e) {
 					if (e instanceof NotFound) {
 						return postsService.create({
 							...PostAdapter.fromAPIToLocal(post),
-							displays: [{ _id: display._id, showing: false }],
-							currentDisplay: { _id: display._id, showing: false },
+							displays: [{ _id: currentDisplay._id, showing: false }],
+							currentDisplay: { _id: currentDisplay._id, showing: false },
 						});
 					}
 				}
