@@ -10,7 +10,7 @@ type PostFrontendEvent = {
 	_id: number;
 	exposeTime: number;
 	media: Media;
-	displayId: number;
+	currentDisplayId: number;
 };
 
 export default function (app: Application): void {
@@ -18,10 +18,6 @@ export default function (app: Application): void {
 		// If no real-time functionality has been configured just return
 		return;
 	}
-
-	const postsService = app.service("posts");
-	const serverStatusCheckerService = app.service("server-status-checker");
-	const showcaseChecker = app.service("showcase-checker");
 
 	app.on("connection", async (connection: any): Promise<void> => {
 		// On a new real-time connection, add it to the anonymous channel
@@ -75,13 +71,13 @@ export default function (app: Application): void {
 	});
 	// Since syncing is global, can emit to all channels/displays
 	app.service("posts").publish("sync-finish", (post: PostFrontendEvent) => {
-		return app.channel(`display/${post.displayId}`);
+		return app.channel(`display/${post.currentDisplayId}`);
 	});
 	app.service("posts").publish("start-post", (post: PostFrontendEvent) => {
-		return app.channel(`display/${post.displayId}`);
+		return app.channel(`display/${post.currentDisplayId}`);
 	});
 	app.service("posts").publish("end-post", (post: PostFrontendEvent) => {
-		return app.channel(`display/${post.displayId}`);
+		return app.channel(`display/${post.currentDisplayId}`);
 	});
 
 	// With the userid and email organization from above you can easily select involved users
