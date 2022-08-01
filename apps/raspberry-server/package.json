@@ -1,5 +1,5 @@
 {
-  "name": "raspberry-server",
+  "name": "@intus/raspberry-server",
   "description": "Locally installed Raspberry server",
   "version": "0.0.0",
   "homepage": "",
@@ -27,7 +27,7 @@
     "test": "yarn run lint && yarn run compile && yarn run jest",
     "lint": "eslint src/. test/. --config .eslintrc.json --ext .ts --fix",
     "dev": "ts-node-dev -r dotenv/config --inspect=9229 --respawn --no-notify src/",
-    "start": "yarn run compile && node lib/",
+    "start": "yarn run build && node build/",
     "jest": "jest --forceExit",
     "build": "shx rm -rf build/ && tsc",
     "postbuild": "cp package.json build && cp yarn.lock build && cd build && yarn install --only=production"

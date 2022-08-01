@@ -14,12 +14,6 @@
     },
     "dev": {
       "cache": false
-    },
-    "raspberry-server#build": {
-      "dependsOn": [
-        "raspberry-frontend#build"
-      ],
-      "outputs": []
     }
   }
 }

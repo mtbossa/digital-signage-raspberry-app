@@ -1,15 +1,13 @@
 import React, { SyntheticEvent } from "react";
-import { Post } from "../../App";
+import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
 
 interface VideoProps {
-	showingPost: Post;
-	displayWidth: number;
-	displayHeight: number;
+	showingPost: PostFrontendEvent;
 	onVideoEnded: (event: SyntheticEvent<HTMLVideoElement, Event>) => void;
 }
 
 const Video: React.ForwardRefRenderFunction<HTMLVideoElement, VideoProps> = (
-	{ showingPost, displayWidth, displayHeight, onVideoEnded },
+	{ showingPost, onVideoEnded },
 	ref
 ) => {
 	return (
@@ -18,8 +16,6 @@ const Video: React.ForwardRefRenderFunction<HTMLVideoElement, VideoProps> = (
 			ref={ref}
 			muted
 			autoPlay
-			width={displayWidth}
-			height={displayHeight}
 			onEnded={onVideoEnded}
 			crossOrigin="anonymous"
 		></video>
