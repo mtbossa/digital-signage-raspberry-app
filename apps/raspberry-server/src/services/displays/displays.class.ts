@@ -85,7 +85,7 @@ export class Displays extends Service<Display> {
 
 		console.log(`[ CONNECTING DISPLAY ${display._id} TO LARAVEL CHANNELS ]`);
 
-		const authorizationToken: string = display.apiToken;
+		const authorizationToken: string = this.app.get("storeAPIToken");
 		const apiUrl: string = this.app.get("apiUrl");
 		const raspberryId: number = display._id;
 		const mediasService: Medias = this.app.service("medias");

@@ -18,7 +18,7 @@ export interface Media {
 }
 
 const postsService = client.service("posts");
-const displaysService = client.service("displays");
+const displayConnectService = client.service("display-connect");
 
 const getDisplayIdFromUrlPath = (pathname: string): number => {
 	const afterLastSlash = pathname.substring(pathname.lastIndexOf("/") + 1);
@@ -31,36 +31,30 @@ function App() {
 	const [currentPosts, setCurrentPosts] = useState<Post[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
-	const setupWebSocket = useCallback(() => {
-		displaysService.on(
-			"displays-sync-finish",
-			(data: { status: "finish" | "failed" }) => {
-				displaysService.connect({
-					displayId: getDisplayIdFromUrlPath(window.location.pathname),
-				});
+	const setupWebSocket = useCallback(async () => {
+		displayConnectService.create({
+			displayId: getDisplayIdFromUrlPath(window.location.pathname),
+		});
 
-				postsService.on(
-					"sync-finish",
-					(data: { status: "finish" | "failed" }) => {
-						console.log("sync-finish");
-						setIsLoading(false);
-					}
-				);
+		postsService.on("sync-finish", (data: { status: "finish" | "failed" }) => {
+			console.log("sync-finish");
+			setIsLoading(false);
+		});
 
-				postsService.on("start-post", (post: Post) => {
-					console.log("starting-post");
-					setCurrentPosts(currentPosts => {
-						return [...currentPosts!, post];
-					});
-				});
+		postsService.on("start-post", (post: Post) => {
+			console.log("starting-post");
+			setIsLoading(false);
+			setCurrentPosts(currentPosts => {
+				return [...currentPosts!, post];
+			});
+		});
 
-				postsService.on("end-post", (removedPost: Post) => {
-					setDeletablePosts(currentDeletablePosts => {
-						return [...currentDeletablePosts, removedPost];
-					});
-				});
-			}
-		);
+		postsService.on("end-post", (removedPost: Post) => {
+			setIsLoading(false);
+			setDeletablePosts(currentDeletablePosts => {
+				return [...currentDeletablePosts, removedPost];
+			});
+		});
 	}, []);
 
 	useEffect(() => {

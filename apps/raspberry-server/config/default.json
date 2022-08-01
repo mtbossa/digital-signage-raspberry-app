@@ -16,5 +16,7 @@
   "dbName": "DB_NAME",
   "raspberryId": "RASPBERRY_ID",
   "apiUrl": "API_URL",
-  "raspberryAPIToken": "RASPBERRY_API_TOKEN"
+  "raspberryAPIToken": "RASPBERRY_API_TOKEN",
+  "storeAPIToken": "STORE_API_TOKEN",
+  "storeId": "STORE_ID"
 }

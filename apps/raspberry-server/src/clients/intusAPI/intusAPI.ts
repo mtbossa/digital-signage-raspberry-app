@@ -76,7 +76,7 @@ export class IntusAPI {
 			const response = await this.request.get<Stream>(
 				`${this.apiUrl}/api/media/${filename}/download`,
 				{
-					headers: { Authorization: `Bearer ${this.apiToken}` },
+					headers: { Authorization: `Bearer ${this.storeApiToken}` },
 					responseType: "stream",
 				}
 			);
@@ -130,7 +130,7 @@ export class IntusAPI {
 	public async fetchStoreDisplays(): Promise<Display[]> {
 		try {
 			const response = await this.request.get<Display[]>(
-				`${this.apiUrl}/api/store/${this.storeId}/displays`,
+				`${this.apiUrl}/api/stores/${this.storeId}/displays`,
 				{
 					headers: { Authorization: `Bearer ${this.storeApiToken}` },
 				}

@@ -15,8 +15,12 @@ import { Medias } from "../medias/medias.class";
 import { ServerStatusChecker } from "../server-status-checker/server-status-checker.class";
 import { ShowcaseChecker } from "../showcase-checker/showcase-checker.class";
 
+export interface Data extends Post {
+	currentDisplay: { _id: number; showing: boolean }; // Receives the posts so it can be passed along with the context, however, won't be saved in the database here
+}
+
 // A type interface for our user (it does not validate any data)
-export class Posts extends Service<Post> {
+export class Posts extends Service<Data> {
 	private mediasService: Medias;
 	private showcaseChecker: ShowcaseChecker;
 	private serverStatusCheckerService: ServerStatusChecker;
@@ -73,6 +77,7 @@ export class Posts extends Service<Post> {
 						return this.mediasService.update(foundMedia._id, {
 							...foundMedia,
 							posts: media.posts,
+							display: display,
 						});
 					} catch (e) {
 						if (e instanceof NotFound) {

@@ -3,6 +3,15 @@ import { HookContext } from "@feathersjs/feathers";
 import { Application } from "./declarations";
 
 import { ClientRequestError } from "./clients/intusAPI/intusAPI";
+import { Post } from "./models/posts.model";
+import { Media } from "./models/medias.model";
+
+type PostFrontendEvent = {
+	_id: number;
+	exposeTime: number;
+	media: Media;
+	displayId: number;
+};
 
 export default function (app: Application): void {
 	if (typeof app.channel !== "function") {
@@ -65,14 +74,14 @@ export default function (app: Application): void {
 		return app.channel("anonymous");
 	});
 	// Since syncing is global, can emit to all channels/displays
-	app.service("posts").publish("sync-finish", (data: any) => {
-		return [app.channel(`display/1`), app.channel(`display/2`)];
+	app.service("posts").publish("sync-finish", (post: PostFrontendEvent) => {
+		return app.channel(`display/${post.displayId}`);
 	});
-	app.service("posts").publish("start-post", (data: any) => {
-		return [app.channel(`display/1`), app.channel(`display/2`)];
+	app.service("posts").publish("start-post", (post: PostFrontendEvent) => {
+		return app.channel(`display/${post.displayId}`);
 	});
-	app.service("posts").publish("end-post", (data: any) => {
-		return [app.channel(`display/1`), app.channel(`display/2`)];
+	app.service("posts").publish("end-post", (post: PostFrontendEvent) => {
+		return app.channel(`display/${post.displayId}`);
 	});
 
 	// With the userid and email organization from above you can easily select involved users

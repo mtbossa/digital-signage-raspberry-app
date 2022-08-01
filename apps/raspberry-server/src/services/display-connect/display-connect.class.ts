@@ -1,3 +1,4 @@
+import { NotFound } from "@feathersjs/errors";
 import {
 	Id,
 	NullableId,
@@ -6,6 +7,8 @@ import {
 	ServiceMethods,
 } from "@feathersjs/feathers";
 import { Application } from "../../declarations";
+import { Displays } from "../displays/displays.class";
+import { Posts } from "../posts/posts.class";
 
 interface Data {
 	displayId: number;
@@ -16,10 +19,14 @@ interface ServiceOptions {}
 export class DisplayConnect implements ServiceMethods<Data> {
 	app: Application;
 	options: ServiceOptions;
+	displaysService: Displays;
+	postsService: Posts;
 
 	constructor(options: ServiceOptions = {}, app: Application) {
 		this.options = options;
 		this.app = app;
+		this.displaysService = this.app.service("displays");
+		this.postsService = this.app.service("posts");
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -29,24 +36,37 @@ export class DisplayConnect implements ServiceMethods<Data> {
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async get(id: Id, params?: Params): Promise<Data> {
-		return {
-			displayId: 1,
-		};
+		return { displayId: 1 };
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async create(data: Data, params?: Params): Promise<Data> {
-		console.log("displayConnect: ", data);
-		if (!params) return data;
-		const { provider, connection } = params;
+		console.log(`[ DISPLAY ${data.displayId} CONNECTED ]`);
+
+		if (!data.displayId || !params) return data;
+
+		const { connection } = params;
+
 		if (!connection) return data;
 
-		if (provider === "socketio") {
-			this.app.channel(`display/${data.displayId}`).join(connection);
-		}
-		this.app.channel("anonymous").join(connection);
+		try {
+			const display = await this.displaysService.get(data.displayId);
 
-		return data;
+			this.app.channel(`display/${display._id}`).join(connection);
+			this.app.channel("anonymous").join(connection);
+
+			await this.postsService.sync(display);
+			await this.displaysService.connectToLaravelChannels(display);
+
+			return data;
+		} catch (e) {
+			if (e instanceof NotFound) {
+				console.log(
+					`Display ${data.displayId} not found when frontend connecting`
+				);
+			}
+			return data;
+		}
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
