@@ -25,7 +25,7 @@
   },
   "scripts": {
     "test": "yarn run lint && yarn run compile && yarn run jest",
-    "lint": "eslint src/. test/. --config .eslintrc.json --ext .ts --fix --max-warnings=0",
+    "lint": "eslint src/. test/. --ext .ts --fix --max-warnings=0",
     "dev": "ts-node-dev -r dotenv/config --inspect=9229 --respawn --no-notify src/",
     "start": "yarn run build && node build/",
     "jest": "jest --forceExit",
