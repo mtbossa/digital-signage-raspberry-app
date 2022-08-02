@@ -1,5 +1,5 @@
-import { Post as APIPost } from "../intusAPI";
 import { Post as LocalPost } from "../../../models/posts.model";
+import { Post as APIPost } from "../intusAPI";
 
 export default class PostAdapter {
   public static fromAPIToLocal(post: APIPost): Omit<LocalPost, "displays"> {

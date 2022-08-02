@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import "./global.css";
+
+import { ServiceAddons } from "@feathersjs/feathers";
 import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
-import { Posts } from "@intus/raspberry-server/src/services/posts/posts.class";
 import { DisplayConnect } from "@intus/raspberry-server/src/services/display-connect/display-connect.class";
+import { Posts } from "@intus/raspberry-server/src/services/posts/posts.class";
+import { useCallback, useEffect, useState } from "react";
 
 import PostShowcase from "./components/PostShowcase";
 import client from "./feathers";
-
-import "./global.css";
-import { ServiceAddons } from "@feathersjs/feathers";
 
 const postsService: Posts & ServiceAddons<Posts> = client.service("posts");
 const displayConnectService: DisplayConnect & ServiceAddons<Posts> =

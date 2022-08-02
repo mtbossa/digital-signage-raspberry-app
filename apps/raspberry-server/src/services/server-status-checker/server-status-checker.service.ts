@@ -1,5 +1,6 @@
 // Initializes the `server-status-checker` service on path `/server-status-checker`
 import { ServiceAddons } from "@feathersjs/feathers";
+
 import { Application } from "../../declarations";
 import { ServerStatusChecker } from "./server-status-checker.class";
 import hooks from "./server-status-checker.hooks";

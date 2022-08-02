@@ -1,10 +1,11 @@
 // Initializes the `medias` service on path `/medias`
 import { ServiceAddons } from "@feathersjs/feathers";
-import { Application } from "../../declarations";
-import { Medias } from "./medias.class";
-import createModel from "../../models/medias.model";
-import hooks from "./medias.hooks";
 import { MongooseServiceOptions } from "feathers-mongoose/types";
+
+import { Application } from "../../declarations";
+import createModel from "../../models/medias.model";
+import { Medias } from "./medias.class";
+import hooks from "./medias.hooks";
 
 // Add this service to the service type index
 declare module "../../declarations" {

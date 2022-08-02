@@ -1,5 +1,6 @@
 import { NotFound } from "@feathersjs/errors";
-import { Service, MongooseServiceOptions } from "feathers-mongoose";
+import { MongooseServiceOptions, Service } from "feathers-mongoose";
+
 import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
 import {
   ClientRequestError,

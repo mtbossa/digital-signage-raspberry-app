@@ -2,6 +2,7 @@
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 import { NotFound } from "@feathersjs/errors";
 import { Hook, HookContext } from "@feathersjs/feathers";
+
 import PostAdapter from "../clients/intusAPI/adapters/post-adapter";
 import { Post } from "../clients/intusAPI/intusAPI";
 import { Display } from "../models/displays.model";

@@ -2,23 +2,22 @@ import path from "path";
 
 process.env["NODE_CONFIG_DIR"] = path.join(__dirname, "../", "config/");
 
-import compress from "compression";
-import helmet from "helmet";
-import cors from "cors";
-
-import feathers from "@feathersjs/feathers";
 import configuration from "@feathersjs/configuration";
 import express from "@feathersjs/express";
+import feathers from "@feathersjs/feathers";
+import { HookContext as FeathersHookContext } from "@feathersjs/feathers";
 import socketio from "@feathersjs/socketio";
+import compress from "compression";
+import cors from "cors";
+import helmet from "helmet";
 
+import appHooks from "./app.hooks";
+import channels from "./channels";
 import { Application } from "./declarations";
 import logger from "./logger";
 import middleware from "./middleware";
-import services from "./services";
-import appHooks from "./app.hooks";
-import channels from "./channels";
-import { HookContext as FeathersHookContext } from "@feathersjs/feathers";
 import mongoose from "./mongoose";
+import services from "./services";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const app: Application = express(feathers());

@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import "./PostShowcase.css";
+
 import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
+import { useEffect, useRef, useState } from "react";
+
 import Image from "../Image";
 import Loading from "../Loading";
 import NoPost from "../NoPost";
 import Video from "../Video";
-import "./PostShowcase.css";
 
 interface PostShowcaseProps {
   latestPosts: PostFrontendEvent[];

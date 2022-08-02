@@ -2,8 +2,9 @@
 //
 // See http://mongoosejs.com/docs/models.html
 // for more of what you can do here.
-import { Application } from "../declarations";
 import { Model, Mongoose } from "mongoose";
+
+import { Application } from "../declarations";
 
 export interface Media {
   _id: number;

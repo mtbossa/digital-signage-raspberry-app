@@ -1,7 +1,8 @@
+import type { Stream } from "stream";
+
 import { InternalError } from "../../utils/errors/internal-error";
 import * as HTTPUtil from "../../utils/Request";
 import Storage from "../../utils/Storage";
-import type { Stream } from "stream";
 
 interface PostResponse {
   data: Post[];

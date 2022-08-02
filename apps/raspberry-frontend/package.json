@@ -21,6 +21,9 @@
     "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
   },
+  "devDependencies": {
+    "@intus/eslint-config": "*"
+  },
   "scripts": {
     "dev": "BROWSER=none react-scripts start",
     "build": "react-scripts build",

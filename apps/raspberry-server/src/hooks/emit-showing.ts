@@ -1,6 +1,7 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 import { Hook, HookContext, ServiceAddons } from "@feathersjs/feathers";
+
 import { Display } from "../models/displays.model";
 import { Media } from "../models/medias.model";
 import { Post } from "../models/posts.model";

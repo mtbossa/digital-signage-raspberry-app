@@ -1,5 +1,6 @@
 // Initializes the `display-connect` service on path `/display-connect`
 import { ServiceAddons } from "@feathersjs/feathers";
+
 import { Application } from "../../declarations";
 import { DisplayConnect } from "./display-connect.class";
 import hooks from "./display-connect.hooks";

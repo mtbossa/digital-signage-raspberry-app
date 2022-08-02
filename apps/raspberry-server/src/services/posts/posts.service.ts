@@ -1,10 +1,11 @@
 // Initializes the `posts` service on path `/posts`
 import { ServiceAddons } from "@feathersjs/feathers";
-import { Application } from "../../declarations";
-import { Posts } from "./posts.class";
-import createModel from "../../models/posts.model";
-import hooks from "./posts.hooks";
 import { MongooseServiceOptions } from "feathers-mongoose/types";
+
+import { Application } from "../../declarations";
+import createModel from "../../models/posts.model";
+import { Posts } from "./posts.class";
+import hooks from "./posts.hooks";
 
 // Add this service to the service type index
 declare module "../../declarations" {

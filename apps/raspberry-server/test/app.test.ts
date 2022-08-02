@@ -1,6 +1,6 @@
+import axios from "axios";
 import { Server } from "http";
 import url from "url";
-import axios from "axios";
 
 import app from "../src/app";
 

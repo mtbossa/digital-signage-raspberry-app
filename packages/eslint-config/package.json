@@ -1,0 +1,12 @@
+{
+  "name": "@intus/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "main": "main.js",
+  "files": [
+    "main.js"
+  ],
+  "dependencies": {
+    "eslint-plugin-simple-import-sort": "^7.0.0"
+  }
+}

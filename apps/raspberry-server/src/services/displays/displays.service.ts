@@ -1,8 +1,9 @@
 // Initializes the `displays` service on path `/displays`
 import { ServiceAddons } from "@feathersjs/feathers";
+
 import { Application } from "../../declarations";
-import { Displays } from "./displays.class";
 import createModel from "../../models/displays.model";
+import { Displays } from "./displays.class";
 import hooks from "./displays.hooks";
 
 // Add this service to the service type index

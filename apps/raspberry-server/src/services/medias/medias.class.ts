@@ -1,4 +1,5 @@
-import { Service, MongooseServiceOptions } from "feathers-mongoose";
+import { MongooseServiceOptions, Service } from "feathers-mongoose";
+
 import { Post } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
 import { Display } from "../../models/displays.model";

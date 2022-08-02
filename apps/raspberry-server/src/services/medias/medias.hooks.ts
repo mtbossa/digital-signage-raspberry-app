@@ -1,6 +1,5 @@
-import downloadMedia from "../../hooks/download-media";
-
 import createOrUpdatePosts from "../../hooks/create-or-update-posts";
+import downloadMedia from "../../hooks/download-media";
 
 export default {
   before: {

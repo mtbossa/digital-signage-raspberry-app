@@ -1,7 +1,10 @@
 import { NotFound } from "@feathersjs/errors";
-import { Service, MongooseServiceOptions } from "feathers-mongoose";
-import Pusher, { Options } from "pusher-js";
+import { Params } from "@feathersjs/feathers";
+import { MongooseServiceOptions, Service } from "feathers-mongoose";
 import Echo, { Channel } from "laravel-echo";
+import Pusher, { Options } from "pusher-js";
+
+import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
 import {
   Display as APIDisplay,
   IntusAPI,
@@ -11,8 +14,6 @@ import {
 import { Application } from "../../declarations";
 import { Display } from "../../models/displays.model";
 import { Medias } from "../medias/medias.class";
-import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
-import { Params } from "@feathersjs/feathers";
 
 type AvailableNotifications = "PostStarted" | "PostEnded";
 interface Notification {

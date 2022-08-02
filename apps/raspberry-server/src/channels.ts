@@ -1,7 +1,8 @@
 import "@feathersjs/transport-commons";
-import { HookContext } from "@feathersjs/feathers";
-import { Application } from "./declarations";
 
+import { HookContext } from "@feathersjs/feathers";
+
+import { Application } from "./declarations";
 import { Media } from "./models/medias.model";
 
 export type PostFrontendEvent = {

@@ -1,3 +1,4 @@
+import { NotFound } from "@feathersjs/errors";
 import {
   Id,
   NullableId,
@@ -6,18 +7,18 @@ import {
   ServiceAddons,
   ServiceMethods,
 } from "@feathersjs/feathers";
-import intusAPI, { ClientRequestError } from "../../clients/intusAPI/intusAPI";
-import { Application } from "../../declarations";
-import { ShowcaseChecker } from "../showcase-checker/showcase-checker.class";
-import { NotFound } from "@feathersjs/errors";
 import Echo, { Channel } from "laravel-echo";
 import Pusher, { Options } from "pusher-js";
+
 import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
+import intusAPI, { ClientRequestError } from "../../clients/intusAPI/intusAPI";
 import { Media, Post } from "../../clients/intusAPI/intusAPI";
-import { Medias } from "../../services/medias/medias.class";
-import { Posts } from "../posts/posts.class";
-import { Displays } from "../displays/displays.class";
+import { Application } from "../../declarations";
 import { Display } from "../../models/displays.model";
+import { Medias } from "../../services/medias/medias.class";
+import { Displays } from "../displays/displays.class";
+import { Posts } from "../posts/posts.class";
+import { ShowcaseChecker } from "../showcase-checker/showcase-checker.class";
 
 type Data = {
   server: "up" | "down";

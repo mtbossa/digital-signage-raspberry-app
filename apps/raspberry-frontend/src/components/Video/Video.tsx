@@ -1,5 +1,5 @@
-import React, { SyntheticEvent } from "react";
 import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
+import React, { SyntheticEvent } from "react";
 
 interface VideoProps {
   showingPost: PostFrontendEvent;

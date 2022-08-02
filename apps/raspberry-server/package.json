@@ -67,6 +67,7 @@
     "@types/serve-favicon": "^2.5.3",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
+    "@intus/eslint-config": "*",
     "axios": "^0.27.2",
     "eslint": "^8.17.0",
     "jest": "^28.1.3",
