@@ -16,7 +16,6 @@
   },
   "devDependencies": {
     "husky": "^8.0.1",
-    "lint-staged": "^13.0.3",
     "prettier": "latest",
     "turbo": "latest"
   },
@@ -25,13 +24,5 @@
     "node": ">=14.0.0"
   },
   "dependencies": {},
-  "packageManager": "yarn@1.22.18",
-  "lint-staged": {
-    "apps/**/*.{js,ts,jsx,tsx}": [
-      "eslint --fix --max-warnings=0"
-    ],
-    "*.json": [
-      "prettier --write"
-    ]
-  }
+  "packageManager": "yarn@1.22.18"
 }
