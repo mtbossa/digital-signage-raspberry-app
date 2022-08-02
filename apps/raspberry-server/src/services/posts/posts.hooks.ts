@@ -1,5 +1,3 @@
-import { HooksObject } from "@feathersjs/feathers";
-
 import emitShowing from '../../hooks/emit-showing';
 
 export default {

@@ -2,8 +2,6 @@ import "@feathersjs/transport-commons";
 import { HookContext } from "@feathersjs/feathers";
 import { Application } from "./declarations";
 
-import { ClientRequestError } from "./clients/intusAPI/intusAPI";
-import { Post } from "./models/posts.model";
 import { Media } from "./models/medias.model";
 
 export type PostFrontendEvent = {
@@ -66,7 +64,7 @@ export default function (app: Application): void {
 	// app.service('users').publish('created', () => app.channel('admins'));
 
 	// Since syncing is global, can emit to all channels/displays
-	app.service("displays").publish("displays-sync-finish", (data: any) => {
+	app.service("displays").publish("displays-sync-finish", () => {
 		return app.channel("anonymous");
 	});
 	// Since syncing is global, can emit to all channels/displays

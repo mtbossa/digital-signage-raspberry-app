@@ -3,7 +3,6 @@ import { Service, MongooseServiceOptions } from "feathers-mongoose";
 import Pusher, { Options } from "pusher-js";
 import Echo, { Channel } from "laravel-echo";
 import {
-	ClientRequestError,
 	Display as APIDisplay,
 	IntusAPI,
 	Media,
@@ -14,9 +13,6 @@ import { Display } from "../../models/displays.model";
 import { Medias } from "../medias/medias.class";
 import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
 import { Params } from "@feathersjs/feathers";
-import { Posts } from "../posts/posts.class";
-import { ShowcaseChecker } from "../showcase-checker/showcase-checker.class";
-import { ServerStatusChecker } from "../server-status-checker/server-status-checker.class";
 
 type AvailableNotifications = "PostStarted" | "PostEnded";
 interface Notification {
@@ -63,7 +59,7 @@ export class Displays extends Service<Display> {
 			const displays: APIDisplay[] = await this.intusAPI.fetchStoreDisplays();
 
 			// TODO filter response and log the rejected ones
-			const res = await Promise.allSettled(
+			await Promise.allSettled(
 				displays.map(async (display: APIDisplay) => {
 					// Checks if display already exists, if doesn't, will throw error NotFound and we'll create it.
 					// Otherwise, update it.

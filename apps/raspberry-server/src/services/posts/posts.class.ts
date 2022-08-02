@@ -1,5 +1,4 @@
 import { NotFound } from "@feathersjs/errors";
-import { Params } from "@feathersjs/feathers";
 import { Service, MongooseServiceOptions } from "feathers-mongoose";
 import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
 import {
@@ -68,7 +67,7 @@ export class Posts extends Service<Data> {
 			});
 
 			// TODO filter response and log the rejected ones
-			const res = await Promise.allSettled(
+			await Promise.allSettled(
 				mediasFilteredWithPosts.map(async media => {
 					// Checks if media already exists, if doesn't, will throw error NotFound and we'll create it.
 					// Otherwise, update it so can create any new posts.
