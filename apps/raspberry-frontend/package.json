@@ -26,13 +26,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "eslint src/. --ext .tsx --fix --max-warnings=0"
   },
   "browserslist": {
     "production": [
