@@ -2,7 +2,7 @@ export class InternalError extends Error {
   constructor(
     public override message: string,
     protected code: number = 500,
-    protected description?: string,
+    protected description?: string
   ) {
     super(message);
     this.name = this.constructor.name;

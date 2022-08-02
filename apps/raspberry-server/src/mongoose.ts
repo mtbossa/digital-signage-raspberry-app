@@ -3,26 +3,26 @@ import { Application } from "./declarations";
 import logger from "./logger";
 
 export default function (app: Application): void {
-	const dbHost = app.get("dbHost");
-	const dbUser = app.get("dbUser");
-	const dbPassword = app.get("dbPassword");
-	const dbName = app.get("dbName");
+  const dbHost = app.get("dbHost");
+  const dbUser = app.get("dbUser");
+  const dbPassword = app.get("dbPassword");
+  const dbName = app.get("dbName");
 
-	let dbUrl = "mongodb://";
-	if (dbUser && dbPassword) {
-		dbUrl = dbUrl + `${dbUser}:${dbPassword}@`;
-	}
+  let dbUrl = "mongodb://";
+  if (dbUser && dbPassword) {
+    dbUrl = dbUrl + `${dbUser}:${dbPassword}@`;
+  }
 
-	dbUrl = dbUrl + `${dbHost}:27017`;
+  dbUrl = dbUrl + `${dbHost}:27017`;
 
-	if (dbName) {
-		dbUrl = dbUrl + `/${dbName}?authSource=admin`;
-	}
+  if (dbName) {
+    dbUrl = dbUrl + `/${dbName}?authSource=admin`;
+  }
 
-	mongoose.connect(dbUrl).catch(err => {
-		logger.error(err);
-		process.exit(1);
-	});
+  mongoose.connect(dbUrl).catch((err) => {
+    logger.error(err);
+    process.exit(1);
+  });
 
-	app.set("mongooseClient", mongoose);
+  app.set("mongooseClient", mongoose);
 }

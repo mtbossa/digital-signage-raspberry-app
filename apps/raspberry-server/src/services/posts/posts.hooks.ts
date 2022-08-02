@@ -1,4 +1,4 @@
-import emitShowing from '../../hooks/emit-showing';
+import emitShowing from "../../hooks/emit-showing";
 
 export default {
   before: {

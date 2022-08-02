@@ -12,14 +12,10 @@ export class Request {
   }
 
   public static isRequestError(error: Error): boolean {
-    return !!(
-      (error as AxiosError).response && (error as AxiosError).response?.status
-    );
+    return !!((error as AxiosError).response && (error as AxiosError).response?.status);
   }
 
-  public static extractErrorData(
-    error: unknown
-  ): Pick<AxiosResponse, "data" | "status"> {
+  public static extractErrorData(error: unknown): Pick<AxiosResponse, "data" | "status"> {
     const axiosError = error as AxiosError;
     if (axiosError.response && axiosError.response.status) {
       return {

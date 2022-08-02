@@ -8,10 +8,10 @@ import displays from "./displays/displays.service";
 // Don't remove this comment. It's needed to format import lines nicely.
 
 export default function (app: Application): void {
-	app.configure(medias);
-	app.configure(posts);
-	app.configure(showcaseChecker);
-	app.configure(serverStatusChecker);
-	app.configure(displays);
-	app.configure(displayConnect);
+  app.configure(medias);
+  app.configure(posts);
+  app.configure(showcaseChecker);
+  app.configure(serverStatusChecker);
+  app.configure(displays);
+  app.configure(displayConnect);
 }
