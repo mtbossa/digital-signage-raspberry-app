@@ -1,5 +1,4 @@
 {
   "serverCheckTimeout": 60000,
-  "showcaseCheckTimeout": 10000,
-  "port": "PORT"
+  "showcaseCheckTimeout": 10000
 }
