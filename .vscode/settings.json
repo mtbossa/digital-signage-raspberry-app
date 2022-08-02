@@ -1,5 +1,5 @@
 {
-  "cSpell.words": [
-    "DOCKERHUB"
-  ]
+  "cSpell.words": ["DOCKERHUB"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
 }
