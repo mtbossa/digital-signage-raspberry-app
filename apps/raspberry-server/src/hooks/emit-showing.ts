@@ -10,34 +10,33 @@ import { Posts } from "../services/posts/posts.class";
 // Emits showing after media is downloaded
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (options = {}): Hook => {
-	return async (context: HookContext): Promise<HookContext> => {
-		const mediasService: Medias = context.app.service("medias");
-		const postsService: Posts & ServiceAddons<Posts> =
-			context.app.service("posts");
+  return async (context: HookContext): Promise<HookContext> => {
+    const mediasService: Medias = context.app.service("medias");
+    const postsService: Posts & ServiceAddons<Posts> = context.app.service("posts");
 
-		const post: Post = context.data;
-		const currentDisplay: Display = context.data.currentDisplay;
-		const media: Media = await mediasService.get(post.mediaId); // Will always exists, because every Post has a Media, it's required
+    const post: Post = context.data;
+    const currentDisplay: Display = context.data.currentDisplay;
+    const media: Media = await mediasService.get(post.mediaId); // Will always exists, because every Post has a Media, it's required
 
-		// TODO do something if media is not downloaded, since it should be
-		if (!media.downloaded) return context;
+    // TODO do something if media is not downloaded, since it should be
+    if (!media.downloaded) return context;
 
-		if (post.showing) {
-			postsService.emit("start-post", {
-				_id: post._id,
-				exposeTime: post.exposeTime,
-				media,
-				currentDisplayId: currentDisplay._id,
-			});
-		} else {
-			postsService.emit("end-post", {
-				_id: post._id,
-				exposeTime: post.exposeTime,
-				media,
-				currentDisplayId: currentDisplay._id,
-			});
-		}
+    if (post.showing) {
+      postsService.emit("start-post", {
+        _id: post._id,
+        exposeTime: post.exposeTime,
+        media,
+        currentDisplayId: currentDisplay._id,
+      });
+    } else {
+      postsService.emit("end-post", {
+        _id: post._id,
+        exposeTime: post.exposeTime,
+        media,
+        currentDisplayId: currentDisplay._id,
+      });
+    }
 
-		return context;
-	};
+    return context;
+  };
 };

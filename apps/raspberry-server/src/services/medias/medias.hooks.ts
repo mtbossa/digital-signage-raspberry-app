@@ -1,8 +1,6 @@
-import { HooksObject } from "@feathersjs/feathers";
-
 import downloadMedia from "../../hooks/download-media";
 
-import createOrUpdatePosts from '../../hooks/create-or-update-posts';
+import createOrUpdatePosts from "../../hooks/create-or-update-posts";
 
 export default {
   before: {
