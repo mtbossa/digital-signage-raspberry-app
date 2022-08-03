@@ -4,6 +4,7 @@
     "node": true,
     "jest": true
   },
+  "globals": { "NodeJS": true },
   "parserOptions": {
     "parser": "@typescript-eslint/parser",
     "ecmaVersion": 2018,
@@ -13,7 +14,8 @@
   "extends": ["plugin:@typescript-eslint/recommended", "@intus/eslint-config"],
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-empty-interface": "off"
+    "@typescript-eslint/no-empty-interface": "off",
+    "no-unused-vars": "warn"
   },
   "ignorePatterns": ["public/*"]
 }
