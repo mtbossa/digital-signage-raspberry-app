@@ -1,14 +1,15 @@
-name: Build Docker staging image
+name: Build and Push Raspberry app Docker image
 on:
   push:
     branches: ["main", "staging"]
     paths:
       [
-        "apps/**/src/**",
-        "apps/**/config/default.json",
-        "apps/**/config/production.json",
-        "apps/**/config/staging.json",
-        "Dockerfile.production",
+        ".github/workflows/update-docker-image.yml",
+        "apps/raspberry-*/src/**",
+        "apps/raspberry-*/config/default.json",
+        "apps/raspberry-*/config/production.json",
+        "apps/raspberry-*/config/staging.json",
+        "Dockerfile.raspberry",
       ]
 jobs:
   build:
