@@ -1,6 +1,6 @@
 FROM node:16
 
-ENV PORT=3030
+ENV PORT=45691
 
 RUN mkdir -p /intus/app /intus/public/medias /intus/config
 
