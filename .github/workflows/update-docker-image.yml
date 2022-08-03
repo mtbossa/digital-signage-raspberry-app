@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Build
-        run: yarn build
+        run: yarn build:raspberry
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -56,4 +56,4 @@ jobs:
           push: true
           context: .
           tags: ${{env.DOCKER_IMAGE_NAME}}
-          file: Dockerfile.production
+          file: Dockerfile.raspberry
