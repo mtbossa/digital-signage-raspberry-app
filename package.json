@@ -9,10 +9,13 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
+    "test": "turbo run test",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "turbo run format",
+    "prepare": "husky install"
   },
   "devDependencies": {
+    "husky": "^8.0.1",
     "prettier": "latest",
     "turbo": "latest"
   },

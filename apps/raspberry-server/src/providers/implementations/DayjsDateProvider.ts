@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isBetween from "dayjs/plugin/isBetween";
 import isoWeek from "dayjs/plugin/isoWeek";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
 import type { DateProvider, UnitTypes } from "../DateProvider";
 
 dayjs.extend(isSameOrBefore);
@@ -51,15 +52,24 @@ export default class DayjsDateProvider implements DateProvider {
     const start = dayjs(`${now.format("YYYY-MM-DD")} ${startTime}`);
     const end = dayjs(`${now.format("YYYY-MM-DD")} ${endTime}`);
 
-    if (start.isAfter(end, "hour") || (start.isSame(end, "hour") && start.isAfter(end, "minute"))) {
+    if (
+      start.isAfter(end, "hour") ||
+      (start.isSame(end, "hour") && start.isAfter(end, "minute"))
+    ) {
       const startOfToday = now.startOf("day");
       const endOfToday = now.endOf("day");
 
       const endYesterdayMinutesShowToday = Math.abs(startOfToday.diff(end, "minutes"));
-      const todayShowEndYesterday = startOfToday.add(endYesterdayMinutesShowToday, "minutes");
+      const todayShowEndYesterday = startOfToday.add(
+        endYesterdayMinutesShowToday,
+        "minutes"
+      );
 
       const startTodayMinutesShowToday = Math.abs(endOfToday.diff(start, "minutes"));
-      const todayShowStartToday = endOfToday.subtract(startTodayMinutesShowToday, "minutes");
+      const todayShowStartToday = endOfToday.subtract(
+        startTodayMinutesShowToday,
+        "minutes"
+      );
 
       if (now.isBetween(todayShowEndYesterday, todayShowStartToday, "minute", "[)")) {
         return false;

@@ -1,5 +1,6 @@
 // Initializes the `showcaseChecker` service on path `/showcase-checker`
 import { ServiceAddons } from "@feathersjs/feathers";
+
 import { Application } from "../../declarations";
 import DayjsDateProvider from "../../providers/implementations/DayjsDateProvider";
 import { ShowcaseChecker } from "./showcase-checker.class";

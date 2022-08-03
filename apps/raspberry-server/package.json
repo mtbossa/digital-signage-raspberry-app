@@ -25,12 +25,13 @@
   },
   "scripts": {
     "test": "yarn run lint && yarn run compile && yarn run jest",
-    "lint": "eslint src/. test/. --config .eslintrc.json --ext .ts --fix",
+    "lint": "eslint src/. test/. --ext .ts --fix",
     "dev": "ts-node-dev -r dotenv/config --inspect=9229 --respawn --no-notify src/",
     "start": "yarn run build && node build/",
     "jest": "jest --forceExit",
     "build": "shx rm -rf build/ && tsc",
-    "postbuild": "cp package.json build && cp yarn.lock build && cd build && yarn install --only=production"
+    "format": "prettier --write \"**/*.{ts,md}\"",
+    "postbuild": "cp package.json build && cp yarn.lock build && cd build && yarn remove @intus/eslint-config && yarn install --production"
   },
   "standard": {
     "env": [
@@ -52,6 +53,7 @@
     "dotenv": "^16.0.1",
     "feathers-mongoose": "^8.5.1",
     "helmet": "^5.1.0",
+    "axios": "^0.27.2",
     "laravel-echo": "^1.12.0",
     "mongodb-core": "^3.2.7",
     "mongoose": "^6.3.6",
@@ -66,7 +68,7 @@
     "@types/serve-favicon": "^2.5.3",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
-    "axios": "^0.27.2",
+    "@intus/eslint-config": "*",
     "eslint": "^8.17.0",
     "jest": "^28.1.3",
     "shx": "^0.3.4",

@@ -3,5 +3,6 @@
   "dbPort": "DB_PORT",
   "dbUser": null,
   "dbPassword": null,
-  "dbName": null
+  "dbName": null,
+  "port": 3030
 }
