@@ -37,3 +37,8 @@ services:
 
 volumes:
   intus-mongodb:
+# For testing with local Laravel Sail backend
+# networks:
+#   default:
+#     name: intus-backend_sail # Change the name to Laravel Sail network's name
+#     external: true
