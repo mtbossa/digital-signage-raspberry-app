@@ -1,7 +1,7 @@
 import "./PostShowcase.css";
 
 import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import Image from "../Image";
 import Loading from "../Loading";
