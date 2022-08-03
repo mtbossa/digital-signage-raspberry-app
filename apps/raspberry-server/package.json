@@ -31,7 +31,7 @@
     "jest": "jest --forceExit",
     "build": "shx rm -rf build/ && tsc",
     "format": "prettier --write \"**/*.{ts,md}\"",
-    "postbuild": "cp package.json build && cp yarn.lock build && cd build && yarn install --only=production"
+    "postbuild": "cp package.json build && cp yarn.lock build && cd build && yarn remove @intus/eslint-config && yarn install --production"
   },
   "standard": {
     "env": [
