@@ -1,3 +1,4 @@
+// How to configure this file: https://github.com/angular-eslint/angular-eslint#seriously-move-mostly-all-configuration-into-overrides
 {
   "root": true,
   "ignorePatterns": ["projects/**/*"],
@@ -10,7 +11,8 @@
       },
       "extends": [
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "@intus/eslint-config"
       ],
       "rules": {
         "@angular-eslint/directive-selector": [
@@ -28,14 +30,32 @@
             "prefix": "app",
             "style": "kebab-case"
           }
-        ],
-        "quotes": ["error", "single"]
+        ]
+      }
+    },
+    {
+      "files": ["*.spec.ts", "test.ts", "main.ts"],
+      "env": {
+        "browser": true,
+        "jasmine": true
+      },
+      "rules": {
+        "no-unused-vars": "off"
       }
     },
     {
       "files": ["*.html"],
       "extends": ["plugin:@angular-eslint/template/recommended"],
       "rules": {}
+    },
+    {
+      "files": ["*.html"],
+      "excludedFiles": ["*inline-template-*.component.html"],
+      "extends": ["plugin:prettier/recommended"],
+      "rules": {
+        // NOTE: WE ARE OVERRIDING THE DEFAULT CONFIG TO ALWAYS SET THE PARSER TO ANGULAR (SEE BELOW)
+        "prettier/prettier": ["error", { "parser": "angular" }]
+      }
     }
   ]
 }
