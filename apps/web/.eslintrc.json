@@ -13,9 +13,10 @@
         "createDefaultProgram": true
       },
       "extends": [
-        "@intus/eslint-config",
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "@intus/eslint-config",
+        "plugin:@typescript-eslint/recommended"
       ],
       "rules": {
         "@angular-eslint/directive-selector": [
@@ -33,8 +34,7 @@
             "prefix": "app",
             "style": "kebab-case"
           }
-        ],
-        "no-unused-vars": "off"
+        ]
       }
     },
     {
