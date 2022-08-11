@@ -1,0 +1,39 @@
+<div class="tui-container tui-container_adaptive">
+  <form [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+    <div class="tui-row tui-row_sme">
+      <div class="tui-col_5">
+        <h3 class="tui-form__header tui-form__header_margin-top_none">Login</h3>
+        <div class="tui-form__row">
+          <tui-input tuiTextfieldExampleText="Field placeholder" formControlName="email">
+            Email
+          </tui-input>
+          <tui-error
+            formControlName="email"
+            [error]="[] | tuiFieldError | async"
+          ></tui-error>
+        </div>
+        <div class="tui-form__row">
+          <tui-input-password formControlName="password"> Senha </tui-input-password>
+          <tui-error
+            formControlName="password"
+            [error]="[] | tuiFieldError | async"
+          ></tui-error>
+        </div>
+        <div class="tui-form__row tui-form__row_checkboxes">
+          <tui-checkbox-labeled
+            formControlName="remember"
+            size="m"
+            class="tui-form__checkbox"
+          >
+            Lembrar de mim
+          </tui-checkbox-labeled>
+        </div>
+        <div class="tui-form__buttons tui-form__buttons_align_center">
+          <button tuiButton size="l" type="submit" class="tui-form__button">
+            Entrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
