@@ -30,8 +30,6 @@ const updateDisplayPost = async (
 		(display: { _id: number; showing: boolean }) => {
 			if (display._id !== post.currentDisplayId) return display;
 
-			console.log('a');
-
 			return { ...display, ...updatedValues };
 		}
 	);
