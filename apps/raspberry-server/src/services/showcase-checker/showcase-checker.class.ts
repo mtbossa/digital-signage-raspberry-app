@@ -42,18 +42,17 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
     this.interval = setInterval(async () => {
       console.log("[ CHECKING POSTS SHOWCASE ]");
 
-      // const allPosts: Post[] = (await this.postsService.find({
-      // 	paginate: false,
-      // })) as Post[];
+      const allPosts: Post[] = (await this.postsService.find({
+        paginate: false,
+      })) as Post[];
 
-      // TODO post checker for single server
-      // allPosts.forEach(async post => {
-      // 	// if (this.shouldShow(post) && !post.showing) {
-      // 	//   await this.postsService.update(post._id, { ...post, showing: true });
-      // 	// } else if (!this.shouldShow(post) && post.showing) {
-      // 	//   await this.postsService.update(post._id, { ...post, showing: false });
-      // 	// }
-      // });
+      allPosts.forEach(async (post) => {
+        if (this.shouldShow(post) && !post.showing) {
+          await this.postsService.update(post._id, { ...post, showing: true });
+        } else if (!this.shouldShow(post) && post.showing) {
+          await this.postsService.update(post._id, { ...post, showing: false });
+        }
+      });
     }, this.checkTimeout);
   }
 
@@ -74,9 +73,7 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
   }
 
   private calculateRecurrent(post: Post): boolean {
-    if (!post.recurrence)
-      throw new Error(`Recurrent post without recurrence. Post: ${post}`);
-    const recurrence = post.recurrence;
+    const recurrence = post.recurrence!;
     const isRecurrenceDay = Object.entries(recurrence)
       .map(([unit, value]) => {
         if (!value) return true;
@@ -98,12 +95,9 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
   }
 
   private calculateNonRecurrent(post: Post): boolean {
-    if (!post.startDate || !post.endDate)
-      throw new Error(`Non recurrent post without post start or end date. ${post}`);
-
     if (
-      this.dateProvider.isDateBeforeToday(post.endDate) ||
-      this.dateProvider.isDateAfterToday(post.startDate)
+      this.dateProvider.isDateBeforeToday(post.endDate!) ||
+      this.dateProvider.isDateAfterToday(post.startDate!)
     ) {
       return false;
     }

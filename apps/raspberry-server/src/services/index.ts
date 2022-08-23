@@ -1,6 +1,4 @@
 import { Application } from "../declarations";
-import displayConnect from "./display-connect/display-connect.service";
-import displays from "./displays/displays.service";
 import medias from "./medias/medias.service";
 import posts from "./posts/posts.service";
 import serverStatusChecker from "./server-status-checker/server-status-checker.service";
@@ -12,6 +10,4 @@ export default function (app: Application): void {
   app.configure(posts);
   app.configure(showcaseChecker);
   app.configure(serverStatusChecker);
-  app.configure(displays);
-  app.configure(displayConnect);
 }

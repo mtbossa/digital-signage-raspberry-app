@@ -38,7 +38,6 @@ app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Host the public folder
-app.use("/static", express.static(path.resolve(app.get("public"), "static")));
 app.use("/medias", express.static(app.get("medias")));
 app.use("/*", express.static(app.get("public")));
 

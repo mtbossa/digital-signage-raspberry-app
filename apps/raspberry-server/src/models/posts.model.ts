@@ -6,14 +6,9 @@ import { Model, Mongoose } from "mongoose";
 
 import { Application } from "../declarations";
 
-export interface PostDisplay {
-  _id: number;
-  showing: boolean;
-}
 export interface Post {
   _id: number;
   mediaId: number;
-  displays: Array<PostDisplay>;
   startTime: string;
   endTime: string;
   showing: boolean;
@@ -32,10 +27,6 @@ export default function (app: Application): Model<Post> {
   const modelName = "posts";
   const mongooseClient: Mongoose = app.get("mongooseClient");
   const { Schema } = mongooseClient;
-  const displaysSchema = new Schema({
-    _id: { type: Number, required: true },
-    showing: { type: Boolean, default: false },
-  });
   const recurrenceSchema = new Schema({
     isoweekday: { type: Number, default: null },
     day: { type: Number, default: null },
@@ -53,7 +44,6 @@ export default function (app: Application): Model<Post> {
       endDate: { type: String, default: null },
       exposeTime: { type: Number, default: null },
       recurrence: recurrenceSchema,
-      displays: [displaysSchema],
     },
     {
       timestamps: true,

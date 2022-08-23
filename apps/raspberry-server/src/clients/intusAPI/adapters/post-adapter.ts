@@ -2,7 +2,7 @@ import { Post as LocalPost } from "../../../models/posts.model";
 import { Post as APIPost } from "../intusAPI";
 
 export default class PostAdapter {
-  public static fromAPIToLocal(post: APIPost): Omit<LocalPost, "displays"> {
+  public static fromAPIToLocal(post: APIPost): LocalPost {
     return {
       _id: post.id,
       mediaId: post.media.id,

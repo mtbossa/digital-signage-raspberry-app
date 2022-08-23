@@ -14,9 +14,7 @@ import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
 import intusAPI, { ClientRequestError } from "../../clients/intusAPI/intusAPI";
 import { Media, Post } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
-import { Display } from "../../models/displays.model";
 import { Medias } from "../../services/medias/medias.class";
-import { Displays } from "../displays/displays.class";
 import { Posts } from "../posts/posts.class";
 import { ShowcaseChecker } from "../showcase-checker/showcase-checker.class";
 
@@ -42,7 +40,6 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
   private requestTimeout: number;
   private showcaseCheckerService: ShowcaseChecker & ServiceAddons<any>;
   private postsService: Posts & ServiceAddons<any>;
-  private displaysService: Displays & ServiceAddons<any>;
 
   constructor(options: ServiceOptions = {}, app: Application) {
     this.options = options;
@@ -51,7 +48,6 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
     this.requestTimeout = this.app.get("serverCheckTimeout");
     this.showcaseCheckerService = this.app.service("showcase-checker");
     this.postsService = this.app.service("posts");
-    this.displaysService = this.app.service("displays");
   }
 
   start() {
@@ -66,22 +62,10 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
         // If server status was already up, do nothing
         if (this.status.server === "up") return;
 
-        // Here server went back online
-        await this.showcaseCheckerService.stop();
         await this.patch(null, { ...this.status, server: "up" });
-        const displays = (await this.displaysService.find({
-          paginate: false,
-        })) as Array<Display>;
-
-        await Promise.allSettled(
-          displays.map(async (display) =>
-            this.displaysService.connectToLaravelChannels(display)
-          )
-        );
-
-        await Promise.allSettled(
-          displays.map(async (display) => this.postsService.sync(display))
-        );
+        await this.showcaseCheckerService.stop();
+        await this.connectToChannels();
+        await this.postsService.sync();
       } catch (e) {
         if (e instanceof ClientRequestError) {
           console.log("[ SERVER STATUS: DOWN ]");

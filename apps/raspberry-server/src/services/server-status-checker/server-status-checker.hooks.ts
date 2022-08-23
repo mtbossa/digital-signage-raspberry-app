@@ -1,3 +1,5 @@
+import { HooksObject } from "@feathersjs/feathers";
+
 export default {
   before: {
     all: [],

@@ -1,20 +1,18 @@
 import "./PostShowcase.css";
 
-import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
 import React, { useEffect, useRef, useState } from "react";
 
+import { Post } from "../../App";
 import Image from "../Image";
 import Loading from "../Loading";
 import NoPost from "../NoPost";
 import Video from "../Video";
 
 interface PostShowcaseProps {
-  latestPosts: PostFrontendEvent[];
-  updatePosts: (filteredPosts: PostFrontendEvent[]) => void;
+  latestPosts: Post[];
+  updatePosts: (filteredPosts: Post[]) => void;
   clearDeletablePosts: () => void;
-  deletablePosts: PostFrontendEvent[];
-  displayWidth: number;
-  displayHeight: number;
+  deletablePosts: Post[];
   isLoading: boolean;
 }
 
@@ -23,8 +21,6 @@ export default function PostShowcase({
   deletablePosts,
   updatePosts,
   clearDeletablePosts,
-  displayWidth,
-  displayHeight,
   isLoading,
 }: PostShowcaseProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -34,7 +30,7 @@ export default function PostShowcase({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   // Current post being showed on the screen
-  const [showingPost, setShowingPost] = useState<PostFrontendEvent | null>(null);
+  const [showingPost, setShowingPost] = useState<Post | null>(null);
 
   const [currentPostIndex, setCurrentPostIndex] = useState<number>(0);
 
@@ -59,9 +55,7 @@ export default function PostShowcase({
     if (!isPlaying) {
       if (deletablePosts.length > 0) {
         const postsWithoutDeleted = latestPosts.filter((post) => {
-          return deletablePosts.find(
-            (deletedPost: PostFrontendEvent) => post._id !== deletedPost._id
-          );
+          return deletablePosts.find((deletedPost: Post) => post._id !== deletedPost._id);
         });
         updatePosts(postsWithoutDeleted);
         clearDeletablePosts();
@@ -77,7 +71,7 @@ export default function PostShowcase({
     setIsPlaying(false);
   }
 
-  function getNextPost(post: PostFrontendEvent | null): PostFrontendEvent {
+  function getNextPost(post: Post | null): Post {
     if (!post) {
       return latestPosts[0];
     }
