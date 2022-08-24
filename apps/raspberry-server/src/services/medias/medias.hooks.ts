@@ -1,6 +1,5 @@
 import { HooksObject } from "@feathersjs/feathers";
 
-import createOrUpdatePosts from "../../hooks/create-or-update-posts";
 import downloadMedia from "../../hooks/download-media";
 
 export default {
@@ -18,8 +17,8 @@ export default {
     all: [],
     find: [],
     get: [],
-    create: [downloadMedia(), createOrUpdatePosts()],
-    update: [createOrUpdatePosts()],
+    create: [downloadMedia()],
+    update: [],
     patch: [],
     remove: [],
   },

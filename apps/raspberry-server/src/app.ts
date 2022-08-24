@@ -16,7 +16,6 @@ import channels from "./channels";
 import { Application } from "./declarations";
 import logger from "./logger";
 import middleware from "./middleware";
-import mongoose from "./mongoose";
 import services from "./services";
 // Don't remove this comment. It's needed to format import lines nicely.
 
@@ -44,8 +43,6 @@ app.use("/*", express.static(app.get("public")));
 // Set up Plugins and providers
 app.configure(express.rest());
 app.configure(socketio());
-
-app.configure(mongoose);
 
 // Configure other middleware (see `middleware/index.ts`)
 app.configure(middleware);

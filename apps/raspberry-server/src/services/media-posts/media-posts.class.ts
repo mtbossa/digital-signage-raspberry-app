@@ -35,13 +35,13 @@ export class MediaPosts implements Pick<ServiceMethods<Data>, "create"> {
     // Checks if media already exists, if doesn't, will throw error NotFound and we'll create it.
     try {
       const foundMedia = await this.mediasService.get(media.id);
-      console.log("creating media");
+      console.log("updating media");
       await this.mediasService.update(foundMedia._id, {
         ...foundMedia,
       });
     } catch (e) {
       if (e instanceof NotFound) {
-        console.log("updating media");
+        console.log("creating media");
         await this.mediasService.create({
           ...MediaAdapter.fromAPIToLocal(media),
         });
@@ -52,13 +52,13 @@ export class MediaPosts implements Pick<ServiceMethods<Data>, "create"> {
       media.posts.map(async (post: Post) => {
         try {
           const foundPost = await this.postsService.get(post.id);
-          console.log("creating post");
+          console.log("updating post");
           return this.postsService.update(foundPost._id, {
             ...PostAdapter.fromAPIToLocal(post),
           });
         } catch (e) {
           if (e instanceof NotFound) {
-            console.log("updating post");
+            console.log("creating post");
             return this.postsService.create({
               ...PostAdapter.fromAPIToLocal(post),
             });

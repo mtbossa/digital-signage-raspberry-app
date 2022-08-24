@@ -11,11 +11,13 @@ import Echo, { Channel } from "laravel-echo";
 import Pusher, { Options } from "pusher-js";
 
 import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
+import PostAdapter from "../../clients/intusAPI/adapters/post-adapter";
 import intusAPI, { ClientRequestError } from "../../clients/intusAPI/intusAPI";
 import { Media, Post } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
 import { Medias } from "../../services/medias/medias.class";
 import { Posts } from "../posts/posts.class";
+import { PostsSync } from "../posts-sync/posts-sync.class";
 import { ShowcaseChecker } from "../showcase-checker/showcase-checker.class";
 
 type Data = {
@@ -39,7 +41,7 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
 
   private requestTimeout: number;
   private showcaseCheckerService: ShowcaseChecker & ServiceAddons<any>;
-  private postsService: Posts & ServiceAddons<any>;
+  private postsSyncService: PostsSync;
 
   constructor(options: ServiceOptions = {}, app: Application) {
     this.options = options;
@@ -47,7 +49,7 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
 
     this.requestTimeout = this.app.get("serverCheckTimeout");
     this.showcaseCheckerService = this.app.service("showcase-checker");
-    this.postsService = this.app.service("posts");
+    this.postsSyncService = this.app.service("posts-sync");
   }
 
   start() {
@@ -65,7 +67,7 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
         await this.patch(null, { ...this.status, server: "up" });
         await this.showcaseCheckerService.stop();
         await this.connectToChannels();
-        await this.postsService.sync();
+        await this.postsSyncService.create({});
       } catch (e) {
         if (e instanceof ClientRequestError) {
           console.log("[ SERVER STATUS: DOWN ]");
@@ -92,10 +94,11 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
 
     console.log("[ CONNECTING TO LARAVEL CHANNELS ]");
 
-    const authorizationToken: string = this.app.get("raspberryAPIToken");
+    const authorizationToken: string = this.app.get("displayAPIToken");
     const apiUrl: string = this.app.get("apiUrl");
-    const raspberryId: number = this.app.get("raspberryId");
+    const displayId: number = this.app.get("displayId");
     const mediasService: Medias = this.app.service("medias");
+    const postsService: Posts = this.app.service("posts");
 
     const options: Options = {
       authEndpoint: `${apiUrl}/api/broadcasting/auth`,
@@ -124,7 +127,7 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
       },
     });
 
-    const channel: Channel = laravelEcho.private(`App.Models.Raspberry.${raspberryId}`);
+    const channel: Channel = laravelEcho.private(`App.Models.Display.${displayId}`);
 
     channel.notification(async (notification: Notification) => {
       const post = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
@@ -138,15 +141,27 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
         default:
           try {
             const foundMedia = await mediasService.get(media.id);
-            return mediasService.update(foundMedia._id, {
+            mediasService.update(foundMedia._id, {
               ...foundMedia,
-              posts: [post],
             });
           } catch (e) {
             if (e instanceof NotFound) {
-              return mediasService.create({
+              mediasService.create({
                 ...MediaAdapter.fromAPIToLocal(media),
-                posts: [post],
+              });
+            }
+          }
+
+          try {
+            const foundPost = await postsService.get(post.id);
+            postsService.update(foundPost._id, {
+              ...foundPost,
+              ...PostAdapter.fromAPIToLocal(post),
+            });
+          } catch (e) {
+            if (e instanceof NotFound) {
+              postsService.create({
+                ...PostAdapter.fromAPIToLocal(post),
               });
             }
           }

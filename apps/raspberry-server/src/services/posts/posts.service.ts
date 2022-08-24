@@ -1,6 +1,5 @@
 // Initializes the `posts` service on path `/posts`
 import { ServiceAddons } from "@feathersjs/feathers";
-import { MongooseServiceOptions } from "feathers-mongoose/types";
 
 import { Application } from "../../declarations";
 import createModel from "../../models/posts.model";
@@ -15,9 +14,8 @@ declare module "../../declarations" {
 }
 
 export default function (app: Application): void {
-  const options: Partial<MongooseServiceOptions<any>> = {
+  const options = {
     Model: createModel(app),
-    whitelist: ["$populate"],
     paginate: app.get("paginate"),
     events: ["sync-finish", "start-post", "end-post"],
   };

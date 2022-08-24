@@ -11,7 +11,7 @@ export default function (app: Application): void {
     return;
   }
 
-  const postsService = app.service("posts");
+  const postsSyncService = app.service("posts-sync");
   const serverStatusCheckerService = app.service("server-status-checker");
   const showcaseChecker = app.service("showcase-checker");
 
@@ -24,7 +24,7 @@ export default function (app: Application): void {
     // When initializing the system, checks connection so when frontend is connected
     // we already know if we have internet connection or not
     try {
-      await postsService.sync();
+      await postsSyncService.create({});
       await serverStatusCheckerService.connectToChannels();
     } catch (e) {
       if (e instanceof Error) {

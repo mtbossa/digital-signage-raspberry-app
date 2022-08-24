@@ -1,4 +1,4 @@
-import { MongooseServiceOptions, Service } from "feathers-mongoose";
+import { NedbServiceOptions, Service } from "feathers-nedb";
 
 import { Post } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
@@ -10,7 +10,7 @@ export interface Data extends Media {
 }
 export class Medias extends Service<Data> {
   //eslint-disable-next-line @typescript-eslint/no-unused-vars
-  constructor(options: Partial<MongooseServiceOptions>, app: Application) {
+  constructor(options: Partial<NedbServiceOptions>, app: Application) {
     super(options);
   }
 }
