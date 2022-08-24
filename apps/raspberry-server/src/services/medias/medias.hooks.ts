@@ -1,8 +1,7 @@
 import { HooksObject } from "@feathersjs/feathers";
 
+import convertStringIdToNumber from "../../hooks/convert-string-id-to-number";
 import downloadMedia from "../../hooks/download-media";
-
-import convertStringIdToNumber from '../../hooks/convert-string-id-to-number';
 
 export default {
   before: {
