@@ -9,16 +9,8 @@ import { Medias } from "../medias/medias.class";
 
 // A type interface for our user (it does not validate any data)
 export class Posts extends Service<Post> {
-  private mediasService: Medias;
-
   //eslint-disable-next-line @typescript-eslint/no-unused-vars
-  constructor(
-    options: Partial<NedbServiceOptions>,
-    private app: Application,
-    private intusAPI: IntusAPI = new IntusAPI()
-  ) {
+  constructor(options: Partial<NedbServiceOptions>, private app: Application) {
     super(options);
-
-    this.mediasService = this.app.service("medias");
   }
 }
