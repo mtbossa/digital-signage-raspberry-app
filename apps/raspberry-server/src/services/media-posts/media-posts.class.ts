@@ -32,38 +32,27 @@ export class MediaPosts implements Pick<ServiceMethods<Data>, "create"> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create(media: Data, params?: Params): Promise<Data> {
-    // Checks if media already exists, if doesn't, will throw error NotFound and we'll create it.
-    try {
-      const foundMedia = await this.mediasService.get(media.id);
-      console.log("updating media");
-      await this.mediasService.update(foundMedia._id, {
-        ...foundMedia,
-      });
-    } catch (e) {
-      if (e instanceof NotFound) {
-        console.log("creating media");
-        await this.mediasService.create({
-          ...MediaAdapter.fromAPIToLocal(media),
-        });
+    const test = await this.mediasService.update(
+      media.id,
+      {
+        ...MediaAdapter.fromAPIToLocal(media),
+      },
+      {
+        nedb: { upsert: true },
       }
-    }
+    );
 
     const res = await Promise.allSettled(
       media.posts.map(async (post: Post) => {
-        try {
-          const foundPost = await this.postsService.get(post.id);
-          console.log("updating post");
-          return this.postsService.update(foundPost._id, {
+        return this.postsService.update(
+          post.id,
+          {
             ...PostAdapter.fromAPIToLocal(post),
-          });
-        } catch (e) {
-          if (e instanceof NotFound) {
-            console.log("creating post");
-            return this.postsService.create({
-              ...PostAdapter.fromAPIToLocal(post),
-            });
+          },
+          {
+            nedb: { upsert: true },
           }
-        }
+        );
       })
     );
 

@@ -139,32 +139,25 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
         // updated. However, if someday we decide to do something different based on
         // the event type, it's already prepared for it.
         default:
-          try {
-            const foundMedia = await mediasService.get(media.id);
-            mediasService.update(foundMedia._id, {
-              ...foundMedia,
-            });
-          } catch (e) {
-            if (e instanceof NotFound) {
-              mediasService.create({
-                ...MediaAdapter.fromAPIToLocal(media),
-              });
+          mediasService.update(
+            media.id,
+            {
+              ...MediaAdapter.fromAPIToLocal(media),
+            },
+            {
+              nedb: { upsert: true },
             }
-          }
-
-          try {
-            const foundPost = await postsService.get(post.id);
-            postsService.update(foundPost._id, {
-              ...foundPost,
+          );
+          postsService.update(
+            post.id,
+            {
               ...PostAdapter.fromAPIToLocal(post),
-            });
-          } catch (e) {
-            if (e instanceof NotFound) {
-              postsService.create({
-                ...PostAdapter.fromAPIToLocal(post),
-              });
+            },
+            {
+              nedb: { upsert: true },
             }
-          }
+          );
+
           break;
       }
     });
