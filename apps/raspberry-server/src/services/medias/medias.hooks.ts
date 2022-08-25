@@ -1,5 +1,6 @@
 import { HooksObject } from "@feathersjs/feathers";
 
+import checkMediaDownloaded from "../../hooks/check-media-downloaded";
 import convertStringIdToNumber from "../../hooks/convert-string-id-to-number";
 import downloadMedia from "../../hooks/download-media";
 
@@ -8,8 +9,8 @@ export default {
     all: [convertStringIdToNumber()],
     find: [],
     get: [],
-    create: [],
-    update: [],
+    create: [checkMediaDownloaded()],
+    update: [checkMediaDownloaded()],
     patch: [],
     remove: [],
   },
