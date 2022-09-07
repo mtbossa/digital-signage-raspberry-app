@@ -33,6 +33,7 @@ export interface Media {
   path: string;
   type: string;
   filename: string;
+  canBeDeleted?: boolean;
 }
 
 export class ClientRequestError extends InternalError {

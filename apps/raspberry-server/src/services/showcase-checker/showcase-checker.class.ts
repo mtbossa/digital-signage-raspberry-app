@@ -66,7 +66,7 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
     console.log("[ STOPPING CHECKING POSTS SHOWCASE ]");
   }
 
-  private shouldShow(post: Post) {
+  public shouldShow(post: Post) {
     if (!post.startDate && !post.endDate) return this.calculateRecurrent(post);
 
     return this.calculateNonRecurrent(post);

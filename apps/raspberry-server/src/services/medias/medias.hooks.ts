@@ -3,6 +3,7 @@ import { HooksObject } from "@feathersjs/feathers";
 import checkMediaDownloaded from "../../hooks/check-media-downloaded";
 import convertStringIdToNumber from "../../hooks/convert-string-id-to-number";
 import downloadMedia from "../../hooks/download-media";
+import removeMediaFile from "../../hooks/remove-media-file";
 
 export default {
   before: {
@@ -12,7 +13,7 @@ export default {
     create: [checkMediaDownloaded()],
     update: [checkMediaDownloaded()],
     patch: [],
-    remove: [],
+    remove: [removeMediaFile()],
   },
 
   after: {

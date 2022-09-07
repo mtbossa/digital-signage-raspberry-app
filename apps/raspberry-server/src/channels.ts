@@ -26,6 +26,7 @@ export default function (app: Application): void {
     try {
       await postsSyncService.create({});
       await serverStatusCheckerService.connectToChannels();
+      showcaseChecker.start();
     } catch (e) {
       if (e instanceof Error) {
         console.error("Error while initial syncing: ", e.message);
@@ -37,8 +38,6 @@ export default function (app: Application): void {
           ...serverStatusCheckerService.status,
           server: "down",
         });
-
-        showcaseChecker.start();
       }
     }
 

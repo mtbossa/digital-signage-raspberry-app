@@ -27,7 +27,7 @@ type Data = {
 
 interface ServiceOptions {}
 
-type AvailableNotifications = "PostStarted" | "PostEnded";
+type AvailableNotifications = "PostStarted" | "PostEnded" | "PostCreated" | "PostExpired";
 interface Notification {
   id: string;
   type: AvailableNotifications;
@@ -97,8 +97,6 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
     const authorizationToken: string = this.app.get("displayAPIToken");
     const apiUrl: string = this.app.get("apiUrl");
     const displayId: number = this.app.get("displayId");
-    const mediasService: Medias = this.app.service("medias");
-    const postsService: Posts = this.app.service("posts");
 
     const options: Options = {
       authEndpoint: `${apiUrl}/api/broadcasting/auth`,
@@ -130,39 +128,64 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
     const channel: Channel = laravelEcho.private(`App.Models.Display.${displayId}`);
 
     channel.notification(async (notification: Notification) => {
-      const post = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
-      const media: Media = post.media;
+      const postApi = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
+      const mediaApi: Media = postApi.media;
 
       switch (this.getEventName(notification.type)) {
-        // Since Laravel handles the data, at this moment, we don't need to check
-        // which kind of event it is, because "showing" will come from API already
-        // updated. However, if someday we decide to do something different based on
-        // the event type, it's already prepared for it.
-        default:
-          mediasService.update(
-            media.id,
-            {
-              ...MediaAdapter.fromAPIToLocal(media),
-            },
-            {
-              nedb: { upsert: true },
-            }
-          );
-          postsService.update(
-            post.id,
-            {
-              ...PostAdapter.fromAPIToLocal(post),
-            },
-            {
-              nedb: { upsert: true },
-            }
-          );
-
+        case "PostCreated":
+          await this.handlePostCreate(postApi, mediaApi);
+          break;
+        case "PostExpired":
+          await this.handlePostExpired(postApi, mediaApi);
           break;
       }
     });
 
     await this.patch(null, { ...this.status, channelsConnected: true });
+  }
+
+  private async handlePostCreate(postApi: Post, mediaApi: Media) {
+    const showcaseService: ShowcaseChecker = this.app.service("showcase-checker");
+    const mediasService: Medias = this.app.service("medias");
+    const postsService: Posts = this.app.service("posts");
+
+    await mediasService.update(
+      mediaApi.id,
+      {
+        ...MediaAdapter.fromAPIToLocal(mediaApi),
+      },
+      {
+        nedb: { upsert: true },
+      }
+    );
+    const createdPost = await postsService.update(
+      postApi.id,
+      {
+        ...PostAdapter.fromAPIToLocal(postApi),
+      },
+      {
+        nedb: { upsert: true },
+      }
+    );
+
+    if (showcaseService.shouldShow(createdPost) && !createdPost.showing) {
+      await postsService.update(createdPost._id, { ...createdPost, showing: true });
+    } else if (!showcaseService.shouldShow(createdPost) && createdPost.showing) {
+      await postsService.update(createdPost._id, {
+        ...createdPost,
+        showing: false,
+      });
+    }
+  }
+
+  private async handlePostExpired(postApi: Post, mediaApi: Media) {
+    const mediasService: Medias = this.app.service("medias");
+    const postsService: Posts = this.app.service("posts");
+
+    if (mediaApi.canBeDeleted) {
+      await mediasService.remove(mediaApi.id);
+    }
+    await postsService.remove(postApi.id);
   }
 
   private getEventName(laravelEvent: string): AvailableNotifications {
