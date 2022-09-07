@@ -1,5 +1,6 @@
 import { Id, NullableId, Paginated, Params, ServiceMethods } from "@feathersjs/feathers";
 
+import { Recurrence } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
 import { Post } from "../../models/posts.model";
 import { DateProvider } from "../../providers/DateProvider";
@@ -66,13 +67,17 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
     console.log("[ STOPPING CHECKING POSTS SHOWCASE ]");
   }
 
-  public shouldShow(post: Post) {
+  public shouldShow(
+    post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
+  ) {
     if (!post.startDate && !post.endDate) return this.calculateRecurrent(post);
 
     return this.calculateNonRecurrent(post);
   }
 
-  private calculateRecurrent(post: Post): boolean {
+  private calculateRecurrent(
+    post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
+  ): boolean {
     const recurrence = post.recurrence!;
     const isRecurrenceDay = Object.entries(recurrence)
       .map(([unit, value]) => {
@@ -94,7 +99,9 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
     return this.checkTime(post);
   }
 
-  private calculateNonRecurrent(post: Post): boolean {
+  private calculateNonRecurrent(
+    post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
+  ): boolean {
     if (
       this.dateProvider.isDateBeforeToday(post.endDate!) ||
       this.dateProvider.isDateAfterToday(post.startDate!)
@@ -105,7 +112,9 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
     return this.checkTime(post);
   }
 
-  private checkTime(post: Post): boolean {
+  private checkTime(
+    post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
+  ): boolean {
     return this.dateProvider.isNowBetweenTimes(post.startTime, post.endTime);
   }
 

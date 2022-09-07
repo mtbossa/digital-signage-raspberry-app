@@ -12,7 +12,13 @@ import Pusher, { Options } from "pusher-js";
 
 import MediaAdapter from "../../clients/intusAPI/adapters/media-adapter";
 import PostAdapter from "../../clients/intusAPI/adapters/post-adapter";
-import intusAPI, { ClientRequestError } from "../../clients/intusAPI/intusAPI";
+import intusAPI, {
+  AvailableNotifications,
+  ClientRequestError,
+  Notification,
+  PostCreatedNotification,
+  PostDeletedNotification,
+} from "../../clients/intusAPI/intusAPI";
 import { Media, Post } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
 import { Medias } from "../../services/medias/medias.class";
@@ -26,13 +32,6 @@ type Data = {
 };
 
 interface ServiceOptions {}
-
-type AvailableNotifications = "PostStarted" | "PostEnded" | "PostCreated" | "PostExpired";
-interface Notification {
-  id: string;
-  type: AvailableNotifications;
-  [key: string]: any;
-}
 
 export class ServerStatusChecker implements ServiceMethods<Data> {
   app: Application;
@@ -125,15 +124,12 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
     const channel: Channel = laravelEcho.private(`App.Models.Display.${displayId}`);
 
     channel.notification(async (notification: Notification) => {
-      const postApi = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
-      const mediaApi: Media = postApi.media;
-
       switch (this.getEventName(notification.type)) {
         case "PostCreated":
-          await this.handlePostCreate(postApi, mediaApi);
+          await this.handlePostCreate(notification as PostCreatedNotification);
           break;
-        case "PostExpired":
-          await this.handlePostExpired(postApi, mediaApi);
+        case "PostDeleted":
+          await this.handlePostDeleted(notification as PostDeletedNotification);
           break;
       }
     });
@@ -141,10 +137,13 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
     await this.patch(null, { ...this.status, channelsConnected: true });
   }
 
-  private async handlePostCreate(postApi: Post, mediaApi: Media) {
-    const showcaseService: ShowcaseChecker = this.app.service("showcase-checker");
+  private async handlePostCreate(notification: PostCreatedNotification) {
+    const showcaseChecker: ShowcaseChecker = this.app.service("showcase-checker");
     const mediasService: Medias = this.app.service("medias");
     const postsService: Posts = this.app.service("posts");
+
+    const postApi = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
+    const mediaApi: Media = postApi.media;
 
     await mediasService.update(
       mediaApi.id,
@@ -155,34 +154,25 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
         nedb: { upsert: true },
       }
     );
-    const createdPost = await postsService.update(
-      postApi.id,
-      {
-        ...PostAdapter.fromAPIToLocal(postApi),
-      },
-      {
-        nedb: { upsert: true },
-      }
-    );
 
-    if (showcaseService.shouldShow(createdPost) && !createdPost.showing) {
-      await postsService.update(createdPost._id, { ...createdPost, showing: true });
-    } else if (!showcaseService.shouldShow(createdPost) && createdPost.showing) {
-      await postsService.update(createdPost._id, {
-        ...createdPost,
-        showing: false,
-      });
-    }
+    const converted = PostAdapter.fromAPIToLocal(postApi);
+    await postsService.create({
+      ...converted,
+      showing: showcaseChecker.shouldShow(converted),
+    });
   }
 
-  private async handlePostExpired(postApi: Post, mediaApi: Media) {
+  private async handlePostDeleted(notification: PostDeletedNotification) {
     const mediasService: Medias = this.app.service("medias");
     const postsService: Posts = this.app.service("posts");
 
-    if (mediaApi.canBeDeleted) {
-      await mediasService.remove(mediaApi.id);
+    const { post_id, media_id, canDeleteMedia } = notification;
+
+    if (canDeleteMedia) {
+      await mediasService.remove(media_id);
     }
-    await postsService.remove(postApi.id);
+
+    await postsService.remove(post_id);
   }
 
   private getEventName(laravelEvent: string): AvailableNotifications {

@@ -8,6 +8,24 @@ interface PostResponse {
   data: Post[];
 }
 
+export type AvailableNotifications = "PostCreated" | "PostDeleted";
+
+export interface Notification {
+  id: string;
+  type: AvailableNotifications;
+  [key: string]: any;
+}
+
+export interface PostDeletedNotification extends Notification {
+  post_id: number;
+  media_id: number;
+  canDeleteMedia: boolean;
+}
+
+export interface PostCreatedNotification extends Notification {
+  post: Post;
+}
+
 // Media here is mandatory, since we always send the post with the media from the backend
 export interface Post {
   id: number;

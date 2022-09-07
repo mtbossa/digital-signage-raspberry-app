@@ -14,6 +14,14 @@ export default (options = {}): Hook => {
     const mediasService: Medias = context.app.service("medias");
     const postsService: Posts & ServiceAddons<any> = context.app.service("posts");
 
+    if (context.method === "remove") {
+      const post: Post = context.result;
+      postsService.emit("end-post", {
+        _id: post._id,
+      });
+      return context;
+    }
+
     const post: Post = context.data;
     const media: Media = await mediasService.get(post.mediaId); // Will always exists, because every Post has a Media, it's required
 
@@ -26,7 +34,10 @@ export default (options = {}): Hook => {
         exposeTime: post.exposeTime,
         media,
       });
-    } else {
+    } else if (post.showing === false && context.method !== "create") {
+      // We must only send end-post event when it's an post update, since it's impossible
+      // for a post to be running if it's a post being created, since it's not already created.
+      // So we don't need to emit end-post, even if post.showing is false.
       postsService.emit("end-post", {
         _id: post._id,
         exposeTime: post.exposeTime,

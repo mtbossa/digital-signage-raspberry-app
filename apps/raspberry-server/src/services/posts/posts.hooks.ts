@@ -21,7 +21,7 @@ export default {
     create: [emitShowing()],
     update: [emitShowing()],
     patch: [],
-    remove: [],
+    remove: [emitShowing()],
   },
 
   error: {

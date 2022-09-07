@@ -1,17 +1,22 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 import { Hook, HookContext } from "@feathersjs/feathers";
+import path from "path";
 
+import { Medias } from "../services/medias/medias.class";
 import Storage from "../utils/Storage";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (options = {}): Hook => {
   return async (context: HookContext): Promise<HookContext> => {
     const storage = new Storage();
-    const media = context.data;
+    const mediasService: Medias = context.app.service("medias");
+    const mediaId = context.id!;
+
+    const media = await mediasService.get(mediaId);
 
     try {
-      await storage.delete(media.path);
+      await storage.delete(path.resolve(context.app.get("medias"), media.path));
     } catch (e) {
       console.error("Error while deleting media file: ", e);
     }
