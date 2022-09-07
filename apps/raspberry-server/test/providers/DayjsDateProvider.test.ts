@@ -20,8 +20,10 @@ describe("Dayjs provider", () => {
           });
         });
         describe("Should return false when", () => {
-          it(`Compare date: ${nowFakeDate}`, () => {
-            expect(dayjsDateProvider.isDateAfterToday(nowCompleteFakeDate)).toBe(false);
+          it(`Compare date: ${nowFakeDate} 05:35:00`, () => {
+            expect(dayjsDateProvider.isDateAfterToday(`${nowFakeDate} 05:35:00`)).toBe(
+              false
+            );
           });
 
           it("Compare date: 2021-12-31", () => {
@@ -42,7 +44,9 @@ describe("Dayjs provider", () => {
         });
         describe("Should return false when", () => {
           it(`Compare date: ${nowFakeDate}`, () => {
-            expect(dayjsDateProvider.isDateBeforeToday(nowCompleteFakeDate)).toBe(false);
+            expect(dayjsDateProvider.isDateBeforeToday(`${nowFakeDate} 05:29:00`)).toBe(
+              false
+            );
           });
 
           it(`Compare date: 2022-01-02`, () => {

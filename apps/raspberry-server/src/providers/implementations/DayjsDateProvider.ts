@@ -38,13 +38,13 @@ export default class DayjsDateProvider implements DateProvider {
     const now = dayjs();
     const compare = dayjs(dateToCompare);
 
-    return compare.isAfter(now);
+    return compare.isAfter(now, "day");
   }
 
   isDateBeforeToday(dateToCompare: string): boolean {
     const now = dayjs();
     const compare = dayjs(dateToCompare);
-    return compare.isBefore(now);
+    return compare.isBefore(now, "day");
   }
 
   isNowBetweenTimes(startTime: string, endTime: string): boolean {
