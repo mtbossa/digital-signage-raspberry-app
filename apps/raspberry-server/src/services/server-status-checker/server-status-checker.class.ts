@@ -37,7 +37,7 @@ interface Notification {
 export class ServerStatusChecker implements ServiceMethods<Data> {
   app: Application;
   options: ServiceOptions;
-  public status: Data = { server: "down", channelsConnected: false };
+  public status: Data = { server: "up", channelsConnected: false };
 
   private requestTimeout: number;
   private showcaseCheckerService: ShowcaseChecker & ServiceAddons<any>;
@@ -65,7 +65,6 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
         if (this.status.server === "up") return;
 
         await this.patch(null, { ...this.status, server: "up" });
-        await this.showcaseCheckerService.stop();
         await this.connectToChannels();
         await this.postsSyncService.create({});
       } catch (e) {
@@ -76,8 +75,6 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
           if (this.status.server === "down") return;
 
           await this.patch(null, { ...this.status, server: "down" });
-
-          this.showcaseCheckerService.start();
         }
       }
     }, this.requestTimeout);
