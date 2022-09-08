@@ -98,24 +98,39 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
   private async removeUndeletedPosts(notExpiredPosts: APIPost[]) {
     // Since notExpiredPosts are all the posts that need to be shown
     // we can delete all the others that were not returned from the API
-    const currentLocalPosts = (await this.postsService.find({
-      paginate: false,
-    })) as Post[];
-    const undeletedPosts = currentLocalPosts.filter(
-      (localPost) => notExpiredPosts.findIndex((post) => post.id === localPost._id) < 0
+    const undeletedPosts = await this.findUndeletedPosts(notExpiredPosts);
+    const deletableMediasIds = this.findDeletableMediasIds(
+      notExpiredPosts,
+      undeletedPosts
     );
-
-    const neededMediasIds = [...new Set(notExpiredPosts.map((post) => post.media.id))];
-
-    const deletableMediasIds = undeletedPosts
-      .filter((post) => neededMediasIds.indexOf(post.mediaId) < 0)
-      .map((post) => post.mediaId);
-
     await Promise.allSettled(
       deletableMediasIds.map((mediaId) => this.mediasService.remove(mediaId))
     );
     await Promise.allSettled(
       undeletedPosts.map((post) => this.postsService.remove(post._id))
+    );
+  }
+
+  private findDeletableMediasIds(notExpiredPosts: APIPost[], undeletedPosts: Post[]) {
+    const neededMediasIds = [...new Set(notExpiredPosts.map((post) => post.media.id))];
+    return [
+      ...new Set(
+        undeletedPosts
+          .filter((post) => neededMediasIds.indexOf(post.mediaId) < 0)
+          .map((post) => post.mediaId)
+      ),
+    ];
+  }
+
+  private async findUndeletedPosts(notExpiredPosts: APIPost[]) {
+    const currentLocalPosts = (await this.postsService.find({
+      paginate: false,
+    })) as Post[];
+
+    // Finds all the posts that are locally saved but didn't come on the response from
+    // displays posts request
+    return currentLocalPosts.filter(
+      (localPost) => notExpiredPosts.findIndex((post) => post.id === localPost._id) < 0
     );
   }
 
