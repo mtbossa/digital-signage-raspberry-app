@@ -42,19 +42,15 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
 
     try {
       await this.syncPosts();
-      await this.syncExpiredPosts();
-
       this.status = { synced: true };
     } catch (e) {
       console.log("[ SYNC FINISH WITH ERROR ]");
-
       this.postsService.emit("sync-finish", { status: "finish" });
 
       throw e;
     }
 
     console.log("[ SYNC FINISH ]");
-
     this.postsService.emit("sync-finish", { status: "finish" });
 
     return this.status;
