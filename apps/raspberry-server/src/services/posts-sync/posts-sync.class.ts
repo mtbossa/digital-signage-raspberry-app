@@ -56,20 +56,6 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
     return this.status;
   }
 
-  private async syncExpiredPosts() {
-    const expiredPosts: PostExpired[] = await intusAPI.fetchExpiredPosts();
-    const deletableMediasIds = new Set(
-      expiredPosts.filter((post) => post.canDeleteMedia).map((post) => post.media_id)
-    );
-
-    await Promise.allSettled(
-      [...deletableMediasIds].map((mediaId: number) => this.mediasService.remove(mediaId))
-    );
-    await Promise.allSettled(
-      expiredPosts.map((post) => this.postsService.remove(post.post_id))
-    );
-  }
-
   private async syncPosts() {
     const posts: APIPost[] = await intusAPI.fetchRaspberryPosts();
     const medias: Media[] = posts.map((post) => post.media);
