@@ -1,4 +1,5 @@
 import { Application } from "../declarations";
+import backendChannelsConnector from "./backend-channels-connector/backend-channels-connector.service";
 import mediaPosts from "./media-posts/media-posts.service";
 import medias from "./medias/medias.service";
 import posts from "./posts/posts.service";
@@ -13,5 +14,6 @@ export default function (app: Application): void {
   app.configure(mediaPosts);
   app.configure(postsSync);
   app.configure(showcaseChecker);
+  app.configure(backendChannelsConnector);
   app.configure(serverStatusChecker);
 }

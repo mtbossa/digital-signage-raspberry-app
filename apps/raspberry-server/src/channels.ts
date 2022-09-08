@@ -13,6 +13,7 @@ export default function (app: Application): void {
 
   const postsSyncService = app.service("posts-sync");
   const serverStatusCheckerService = app.service("server-status-checker");
+  const channelsConnectorService = app.service("backend-channels-connector");
   const showcaseChecker = app.service("showcase-checker");
 
   app.on("connection", async (connection: any): Promise<void> => {
@@ -21,12 +22,11 @@ export default function (app: Application): void {
 
     app.channel("anonymous").join(connection);
 
-    // When initializing the system, checks connection so when frontend is connected
+    // When initializing the system, checks connection so when frontend connects
     // we already know if we have internet connection or not
     try {
-      await postsSyncService.create({});
-      await serverStatusCheckerService.connectToChannels();
-      showcaseChecker.start();
+      await postsSyncService.create({ synced: false });
+      await channelsConnectorService.create({ channelsConnected: false });
     } catch (e) {
       if (e instanceof Error) {
         console.error("Error while initial syncing: ", e.message);
@@ -41,6 +41,7 @@ export default function (app: Application): void {
       }
     }
 
+    showcaseChecker.start();
     serverStatusCheckerService.start();
   });
 
