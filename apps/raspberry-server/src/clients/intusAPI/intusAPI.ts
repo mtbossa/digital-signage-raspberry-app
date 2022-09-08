@@ -8,6 +8,16 @@ interface PostResponse {
   data: Post[];
 }
 
+interface PostExpiredResponse {
+  data: PostExpired[];
+}
+
+export interface PostExpired {
+  post_id: number;
+  media_id: number;
+  canDeleteMedia: boolean;
+}
+
 export type AvailableNotifications = "PostCreated" | "PostDeleted";
 
 export interface Notification {
@@ -103,6 +113,32 @@ export class IntusAPI {
       if (err instanceof Error && HTTPUtil.Request.isRequestError(err)) {
         const error = HTTPUtil.Request.extractErrorData(err);
         throw new IntusAPIResponseError(`Error: ${error.data} Code: ${error.status}`);
+      }
+      // Non server (api) errors will fallback to a generic client error
+      throw new ClientRequestError(JSON.stringify(err));
+    }
+  }
+
+  public async fetchExpiredPosts(): Promise<PostExpired[]> {
+    try {
+      const response = await this.request.get<PostExpiredResponse>(
+        `${this.apiUrl}/api/displays/${this.displayId}/posts`,
+        {
+          headers: { Authorization: `Bearer ${this.apiToken}` },
+          params: {
+            fromApp: true,
+            expired: true,
+          },
+        }
+      );
+
+      return response.data.data;
+    } catch (err: unknown) {
+      if (err instanceof Error && HTTPUtil.Request.isRequestError(err)) {
+        const error = HTTPUtil.Request.extractErrorData(err);
+        throw new IntusAPIResponseError(
+          `Error: ${JSON.stringify(error.data)} Code: ${error.status}`
+        );
       }
       // Non server (api) errors will fallback to a generic client error
       throw new ClientRequestError(JSON.stringify(err));

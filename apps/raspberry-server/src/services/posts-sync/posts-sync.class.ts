@@ -1,8 +1,13 @@
 import { Params, ServiceAddons, ServiceMethods } from "@feathersjs/feathers";
 
-import intusAPI, { Media, Post as APIPost } from "../../clients/intusAPI/intusAPI";
+import intusAPI, {
+  Media,
+  Post as APIPost,
+  PostExpired,
+} from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
 import { MediaPosts } from "../media-posts/media-posts.class";
+import { Medias } from "../medias/medias.class";
 import { Posts } from "../posts/posts.class";
 
 interface Data {
@@ -18,6 +23,7 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
 
   mediasPostsService: MediaPosts & ServiceAddons<any>;
   postsService: Posts & ServiceAddons<any>;
+  mediasService: Medias & ServiceAddons<any>;
 
   constructor(options: ServiceOptions = {}, app: Application) {
     this.options = options;
@@ -25,6 +31,7 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
 
     this.mediasPostsService = this.app.service("media-posts");
     this.postsService = this.app.service("posts");
+    this.mediasService = this.app.service("medias");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,26 +40,8 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
     this.status = data;
 
     try {
-      const posts: APIPost[] = await intusAPI.fetchRaspberryPosts();
-      const medias: Media[] = posts.map((post) => post.media);
-
-      const mediasFiltered: Media[] = this.removeDuplicateMedias(medias);
-
-      const mediasFilteredWithPosts = mediasFiltered.map((media: Media) => {
-        const postsFromThisMedia = posts.filter((post) => post.media.id === media.id);
-
-        return {
-          ...media,
-          posts: postsFromThisMedia,
-        };
-      });
-
-      // TODO filter response and log the rejected ones
-      const res = await Promise.allSettled(
-        mediasFilteredWithPosts.map(async (media) => {
-          return this.mediasPostsService.create(media);
-        })
-      );
+      await this.syncPosts();
+      await this.syncExpiredPosts();
 
       this.status = { synced: true };
     } catch (e) {
@@ -68,6 +57,43 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
     this.postsService.emit("sync-finish", { status: "finish" });
 
     return this.status;
+  }
+
+  private async syncExpiredPosts() {
+    const expiredPosts: PostExpired[] = await intusAPI.fetchExpiredPosts();
+    const deletableMediasIds = new Set(
+      expiredPosts.filter((post) => post.canDeleteMedia).map((post) => post.media_id)
+    );
+
+    await Promise.allSettled(
+      [...deletableMediasIds].map((mediaId: number) => this.mediasService.remove(mediaId))
+    );
+    await Promise.allSettled(
+      expiredPosts.map((post) => this.postsService.remove(post.post_id))
+    );
+  }
+
+  private async syncPosts() {
+    const posts: APIPost[] = await intusAPI.fetchRaspberryPosts();
+    const medias: Media[] = posts.map((post) => post.media);
+
+    const mediasFiltered: Media[] = this.removeDuplicateMedias(medias);
+
+    const mediasFilteredWithPosts = mediasFiltered.map((media: Media) => {
+      const postsFromThisMedia = posts.filter((post) => post.media.id === media.id);
+
+      return {
+        ...media,
+        posts: postsFromThisMedia,
+      };
+    });
+
+    // TODO filter response and log the rejected ones
+    const res = await Promise.allSettled(
+      mediasFilteredWithPosts.map(async (media) => {
+        return this.mediasPostsService.create(media);
+      })
+    );
   }
 
   private removeDuplicateMedias(medias: Media[]): Media[] {
