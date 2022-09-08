@@ -1,5 +1,6 @@
 // Initializes the `posts` service on path `/posts`
 import { ServiceAddons } from "@feathersjs/feathers";
+import { NedbServiceOptions } from "feathers-nedb/types";
 
 import { Application } from "../../declarations";
 import createModel from "../../models/posts.model";
@@ -14,7 +15,7 @@ declare module "../../declarations" {
 }
 
 export default function (app: Application): void {
-  const options = {
+  const options: Partial<NedbServiceOptions> = {
     Model: createModel(app),
     paginate: app.get("paginate"),
     events: ["sync-finish", "start-post", "end-post"],

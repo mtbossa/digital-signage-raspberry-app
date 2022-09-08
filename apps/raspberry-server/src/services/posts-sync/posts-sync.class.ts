@@ -6,6 +6,7 @@ import intusAPI, {
   PostExpired,
 } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
+import { Post } from "../../models/posts.model";
 import { MediaPosts } from "../media-posts/media-posts.class";
 import { Medias } from "../medias/medias.class";
 import { Posts } from "../posts/posts.class";
@@ -93,6 +94,32 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
       mediasFilteredWithPosts.map(async (media) => {
         return this.mediasPostsService.create(media);
       })
+    );
+
+    await this.removeUndeletedPosts(posts);
+  }
+
+  private async removeUndeletedPosts(notExpiredPosts: APIPost[]) {
+    // Since notExpiredPosts are all the posts that need to be shown
+    // we can delete all the others that were not returned from the API
+    const currentLocalPosts = (await this.postsService.find({
+      paginate: false,
+    })) as Post[];
+    const undeletedPosts = currentLocalPosts.filter(
+      (localPost) => notExpiredPosts.findIndex((post) => post.id === localPost._id) < 0
+    );
+
+    const neededMediasIds = [...new Set(notExpiredPosts.map((post) => post.media.id))];
+
+    const deletableMediasIds = undeletedPosts
+      .filter((post) => neededMediasIds.indexOf(post.mediaId) < 0)
+      .map((post) => post.mediaId);
+
+    await Promise.allSettled(
+      deletableMediasIds.map((mediaId) => this.mediasService.remove(mediaId))
+    );
+    await Promise.allSettled(
+      undeletedPosts.map((post) => this.postsService.remove(post._id))
     );
   }
 
