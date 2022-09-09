@@ -6,16 +6,14 @@ import { Post } from "../../models/posts.model";
 import { DateProvider } from "../../providers/DateProvider";
 import { Posts } from "../posts/posts.class";
 
-interface Data {
-  running: boolean;
-}
+interface Data {}
 
 interface ServiceOptions {}
 
-export class ShowcaseChecker implements ServiceMethods<Data> {
+export class ShowcaseChecker implements Partial<ServiceMethods<Data>> {
   app: Application;
   options: ServiceOptions;
-  public status: Data = { running: false };
+  public status = { running: false };
 
   private checkTimeout: number;
   private postsService: Posts;
@@ -38,29 +36,48 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
 
     console.log("[ STARTING CHECKING POSTS SHOWCASE ]");
 
-    await this.patch(null, { running: true });
+    this.status.running = true;
 
     this.interval = setInterval(async () => {
       console.log("[ CHECKING POSTS SHOWCASE ]");
-
-      const allPosts: Post[] = (await this.postsService.find({
-        paginate: false,
-      })) as Post[];
-
-      allPosts.forEach(async (post) => {
-        if (this.shouldShow(post) && !post.showing) {
-          await this.postsService.update(post._id, { ...post, showing: true });
-        } else if (!this.shouldShow(post) && post.showing) {
-          await this.postsService.update(post._id, { ...post, showing: false });
-        }
-      });
+      await this.checkPosts();
     }, this.checkTimeout);
+  }
+
+  public async checkPosts() {
+    const postsService = this.app.service("posts");
+    const mediasService = this.app.service("medias");
+
+    const allPosts: Post[] = (await this.postsService.find({
+      paginate: false,
+    })) as Post[];
+
+    allPosts.forEach(async (post) => {
+      if (this.shouldShow(post) && !post.showing) {
+        const media = await mediasService.get(post.mediaId);
+        if (media.downloaded) {
+          await this.postsService.update(post._id, { ...post, showing: true });
+          console.log("[ EVENT start-post ] Emitting start-post: ", { postId: post._id });
+          postsService.emit("start-post", {
+            _id: post._id,
+            exposeTime: post.exposeTime,
+            media,
+          });
+        }
+      } else if (!this.shouldShow(post) && post.showing) {
+        console.log("[ EVENT end-post ] Emitting end-post: ", { postId: post._id });
+        await this.postsService.update(post._id, { ...post, showing: false });
+        postsService.emit("end-post", {
+          _id: post._id,
+        });
+      }
+    });
   }
 
   async stop() {
     if (!this.status.running) return;
 
-    await this.patch(null, { running: false });
+    this.status.running = false;
 
     clearInterval(this.interval);
 
@@ -71,8 +88,8 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
     post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
   ) {
     if (!post.startDate && !post.endDate) return this.calculateRecurrent(post);
-
-    return this.calculateNonRecurrent(post);
+    const shouldShow = this.calculateNonRecurrent(post);
+    return shouldShow;
   }
 
   private calculateRecurrent(
@@ -116,35 +133,5 @@ export class ShowcaseChecker implements ServiceMethods<Data> {
     post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
   ): boolean {
     return this.dateProvider.isNowBetweenTimes(post.startTime, post.endTime);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async find(params?: Params): Promise<Data[] | Paginated<Data>> {
-    return [];
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async get(id: Id, params?: Params): Promise<Data> {
-    return this.status;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async create(data: Data, params?: Params): Promise<Data> {
-    return data;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async update(id: NullableId, data: Data, params?: Params): Promise<Data> {
-    return data;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async patch(id: NullableId, data: Data, params?: Params): Promise<Data> {
-    return (this.status = data);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async remove(id: NullableId, params?: Params): Promise<Data> {
-    return this.status;
   }
 }

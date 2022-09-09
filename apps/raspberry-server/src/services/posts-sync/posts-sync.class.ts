@@ -11,16 +11,14 @@ import { MediaPosts } from "../media-posts/media-posts.class";
 import { Medias } from "../medias/medias.class";
 import { Posts } from "../posts/posts.class";
 
-interface Data {
-  synced: boolean;
-}
+interface Data {}
 
 interface ServiceOptions {}
 
 export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
   app: Application;
   options: ServiceOptions;
-  status: Data = { synced: false };
+  status = { synced: false };
 
   mediasPostsService: MediaPosts & ServiceAddons<any>;
   postsService: Posts & ServiceAddons<any>;
@@ -37,15 +35,16 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create(data: Data, params?: Params): Promise<Data> {
-    console.log("[ SYNCING POSTS ]");
-    this.status = data;
+    const showcaseChecker = this.app.service("showcase-checker");
 
+    console.log("[ SYNCING POSTS ]");
     try {
       await this.syncPosts();
       this.status = { synced: true };
     } catch (e) {
       console.log("[ SYNC FINISH WITH ERROR ]");
       this.postsService.emit("sync-finish", { status: "finish" });
+      await showcaseChecker.checkPosts();
 
       throw e;
     }
@@ -57,10 +56,9 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
   }
 
   private async syncPosts() {
-    const showcaseChecker = this.app.service("showcase-checker");
-
     const posts: APIPost[] = await intusAPI.fetchRaspberryPosts();
     const medias: Media[] = posts.map((post) => post.media);
+    const showcaseChecker = this.app.service("showcase-checker");
 
     const mediasFiltered: Media[] = this.removeDuplicateMedias(medias);
 
@@ -81,6 +79,7 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
     );
 
     await this.removeUndeletedPosts(posts);
+    await showcaseChecker.checkPosts();
   }
 
   private async removeUndeletedPosts(notExpiredPosts: APIPost[]) {

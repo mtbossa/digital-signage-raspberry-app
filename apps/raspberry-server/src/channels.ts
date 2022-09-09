@@ -4,6 +4,7 @@ import { HookContext } from "@feathersjs/feathers";
 
 import { ClientRequestError } from "./clients/intusAPI/intusAPI";
 import { Application } from "./declarations";
+import { Post } from "./models/posts.model";
 
 export default function (app: Application): void {
   if (typeof app.channel !== "function") {
@@ -11,6 +12,7 @@ export default function (app: Application): void {
     return;
   }
 
+  const postsService = app.service("posts");
   const postsSyncService = app.service("posts-sync");
   const serverStatusCheckerService = app.service("server-status-checker");
   const channelsConnectorService = app.service("backend-channels-connector");
@@ -25,6 +27,13 @@ export default function (app: Application): void {
     // When initializing the system, checks connection so when frontend connects
     // we already know if we have internet connection or not
     try {
+      // Sets all posts to showing false, since when system is starting up, no post is showing.
+      const currentPosts = (await postsService.find({ paginate: false })) as Post[];
+      await Promise.allSettled(
+        currentPosts.map((post) =>
+          postsService.update(post._id, { ...post, showing: false })
+        )
+      );
       await postsSyncService.create({ synced: false });
       await channelsConnectorService.create({ channelsConnected: false });
     } catch (e) {

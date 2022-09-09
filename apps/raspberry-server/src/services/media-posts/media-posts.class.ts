@@ -46,12 +46,10 @@ export class MediaPosts implements Pick<ServiceMethods<Data>, "create"> {
 
     const res = await Promise.allSettled(
       media.posts.map(async (post: Post) => {
-        const converted = PostAdapter.fromAPIToLocal(post);
         return this.postsService.update(
           post.id,
           {
-            ...converted,
-            showing: showcaseChecker.shouldShow(converted),
+            ...PostAdapter.fromAPIToLocal(post),
           },
           {
             nedb: { upsert: true },

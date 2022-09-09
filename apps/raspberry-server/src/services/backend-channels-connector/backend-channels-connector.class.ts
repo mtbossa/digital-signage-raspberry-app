@@ -15,20 +15,15 @@ import {
 import { Application } from "../../declarations";
 import { Medias } from "../medias/medias.class";
 import { Posts } from "../posts/posts.class";
-import { ShowcaseChecker } from "../showcase-checker/showcase-checker.class";
 
-interface Data {
-  channelsConnected: boolean;
-}
+interface Data {}
 
 interface ServiceOptions {}
 
-export class BackendChannelsConnector
-  implements Pick<ServiceMethods<Data>, "create" | "patch">
-{
+export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "create"> {
   app: Application;
   options: ServiceOptions;
-  status: Data = { channelsConnected: false };
+  status = { channelsConnected: false };
 
   constructor(options: ServiceOptions = {}, app: Application) {
     this.options = options;
@@ -37,7 +32,6 @@ export class BackendChannelsConnector
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create(data: Data, params?: Params): Promise<Data> {
-    this.status = data;
     // Channels could already be connected, if when starting there was internet connection and server was up.
     // Only won't be connected to the channels if when the system started, there was no connection to the server.
     if (this.status.channelsConnected) return this.status;
@@ -88,18 +82,12 @@ export class BackendChannelsConnector
       }
     });
 
-    await this.patch(null, { channelsConnected: true });
+    this.status.channelsConnected = true;
 
     return this.status;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async patch(id: NullableId, data: Data, params?: Params): Promise<Data> {
-    return (this.status = data);
-  }
-
   private async handlePostCreate(notification: PostCreatedNotification) {
-    const showcaseChecker: ShowcaseChecker = this.app.service("showcase-checker");
     const mediasService: Medias = this.app.service("medias");
     const postsService: Posts = this.app.service("posts");
 
@@ -116,10 +104,8 @@ export class BackendChannelsConnector
       }
     );
 
-    const converted = PostAdapter.fromAPIToLocal(postApi);
     await postsService.create({
-      ...converted,
-      showing: showcaseChecker.shouldShow(converted),
+      ...PostAdapter.fromAPIToLocal(postApi),
     });
   }
 

@@ -64,8 +64,8 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
         if (this.status.server === "up") return;
 
         await this.patch(null, { ...this.status, server: "up" });
-        await this.channelsConnectorService.create({ channelsConnected: false });
-        await this.postsSyncService.create({ synced: false });
+        await this.channelsConnectorService.create({});
+        await this.postsSyncService.create({});
       } catch (e) {
         if (e instanceof ClientRequestError) {
           console.log("[ SERVER STATUS: DOWN ]");
