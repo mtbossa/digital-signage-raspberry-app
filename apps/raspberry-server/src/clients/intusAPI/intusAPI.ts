@@ -45,7 +45,7 @@ export interface Post {
   end_time: string;
   expose_time: number | null;
   media: Media;
-  showing: boolean;
+  expired: boolean;
   recurrence?: Recurrence;
 }
 
