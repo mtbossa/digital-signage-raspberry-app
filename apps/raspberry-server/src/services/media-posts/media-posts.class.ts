@@ -32,7 +32,9 @@ export class MediaPosts implements Pick<ServiceMethods<Data>, "create"> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create(media: Data, params?: Params): Promise<Data> {
-    const test = await this.mediasService.update(
+    const showcaseChecker = this.app.service("showcase-checker");
+
+    await this.mediasService.update(
       media.id,
       {
         ...MediaAdapter.fromAPIToLocal(media),
@@ -44,10 +46,12 @@ export class MediaPosts implements Pick<ServiceMethods<Data>, "create"> {
 
     const res = await Promise.allSettled(
       media.posts.map(async (post: Post) => {
+        const converted = PostAdapter.fromAPIToLocal(post);
         return this.postsService.update(
           post.id,
           {
-            ...PostAdapter.fromAPIToLocal(post),
+            ...converted,
+            showing: showcaseChecker.shouldShow(converted),
           },
           {
             nedb: { upsert: true },
