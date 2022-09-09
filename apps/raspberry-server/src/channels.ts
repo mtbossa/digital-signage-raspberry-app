@@ -49,7 +49,7 @@ export default function (app: Application): void {
         });
       }
     }
-    showcaseChecker.start();
+    showcaseChecker.create({});
     serverStatusCheckerService.start();
   });
 

@@ -10,7 +10,7 @@ interface Data {}
 
 interface ServiceOptions {}
 
-export class ShowcaseChecker implements Partial<ServiceMethods<Data>> {
+export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
   app: Application;
   options: ServiceOptions;
   public status = { running: false };
@@ -31,8 +31,11 @@ export class ShowcaseChecker implements Partial<ServiceMethods<Data>> {
     this.postsService = this.app.service("posts");
   }
 
-  async start() {
-    if (this.status.running) return;
+  async create(
+    data: Partial<Data> | Partial<Data>[],
+    params?: Params | undefined
+  ): Promise<Data | Data[]> {
+    if (this.status.running) return this.status;
 
     console.log("[ STARTING CHECKING POSTS SHOWCASE ]");
 
@@ -42,6 +45,8 @@ export class ShowcaseChecker implements Partial<ServiceMethods<Data>> {
       console.log("[ CHECKING POSTS SHOWCASE ]");
       await this.checkPosts();
     }, this.checkTimeout);
+
+    return this.status;
   }
 
   public async checkPosts() {
