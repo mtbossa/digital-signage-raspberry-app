@@ -8,7 +8,7 @@ export default class PostAdapter {
       mediaId: post.media.id,
       startTime: post.start_time,
       endTime: post.end_time,
-      showing: post.showing,
+      showing: false,
       startDate: post.start_date,
       endDate: post.end_date,
       exposeTime: post.expose_time,
