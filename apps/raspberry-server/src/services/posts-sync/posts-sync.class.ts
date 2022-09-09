@@ -57,6 +57,8 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
   }
 
   private async syncPosts() {
+    const showcaseChecker = this.app.service("showcase-checker");
+
     const posts: APIPost[] = await intusAPI.fetchRaspberryPosts();
     const medias: Media[] = posts.map((post) => post.media);
 
@@ -79,6 +81,7 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
     );
 
     await this.removeUndeletedPosts(posts);
+    showcaseChecker.start();
   }
 
   private async removeUndeletedPosts(notExpiredPosts: APIPost[]) {
