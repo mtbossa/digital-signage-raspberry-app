@@ -24,6 +24,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
 # For testing with local Laravel Sail backend
+# API_URL at .env must be the name of the Laravel Docker container e.g.: http://laravel:80
 # networks:
 #   default:
 #     name: intus-backend_sail # Change the name to Laravel Sail network's name
