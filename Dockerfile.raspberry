@@ -2,6 +2,11 @@ FROM node:16
 
 ENV PORT=45691
 
+RUN apt-get update && \
+    apt-get install -yq tzdata && \
+    ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
+
 RUN mkdir -p /intus/app /intus/public/medias /intus/config
 
 COPY apps/raspberry-server/build /intus/app
