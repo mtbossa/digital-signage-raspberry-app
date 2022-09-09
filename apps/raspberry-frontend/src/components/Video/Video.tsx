@@ -1,6 +1,7 @@
 import React, { SyntheticEvent } from "react";
 
 import { Post } from "../../App";
+import { port } from "../../feathers";
 
 interface VideoProps {
   showingPost: Post;
@@ -13,7 +14,7 @@ const Video: React.ForwardRefRenderFunction<HTMLVideoElement, VideoProps> = (
 ) => {
   return (
     <video
-      src={`http://localhost:3030/medias/${showingPost.media.path}`}
+      src={`http://localhost:${port}/medias/${showingPost.media.path}`}
       ref={ref}
       muted
       autoPlay
