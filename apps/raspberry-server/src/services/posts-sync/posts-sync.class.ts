@@ -81,7 +81,6 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
     );
 
     await this.removeUndeletedPosts(posts);
-    showcaseChecker.start();
   }
 
   private async removeUndeletedPosts(notExpiredPosts: APIPost[]) {
