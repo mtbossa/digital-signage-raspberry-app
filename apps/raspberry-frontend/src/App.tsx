@@ -20,7 +20,7 @@ export interface Media {
 const postsService = client.service("posts");
 
 function App() {
-  const [deletablePosts, setDeletablePosts] = useState<Post[]>([]);
+  const [deletablePosts, setDeletablePosts] = useState<Pick<Post, "_id">[]>([]);
   const [currentPosts, setCurrentPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -32,11 +32,19 @@ function App() {
 
     postsService.on("start-post", (post: Post) => {
       setCurrentPosts((currentPosts) => {
-        return [...currentPosts!, post];
+        const postAlreadyHere = currentPosts.findIndex(
+          (currentPost) => currentPost._id === post._id
+        );
+
+        if (postAlreadyHere === -1) {
+          return [...currentPosts!, post];
+        }
+
+        return currentPosts;
       });
     });
 
-    postsService.on("end-post", (removedPost: Post) => {
+    postsService.on("end-post", (removedPost: Pick<Post, "_id">) => {
       setDeletablePosts((currentDeletablePosts) => {
         return [...currentDeletablePosts, removedPost];
       });

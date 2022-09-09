@@ -12,7 +12,7 @@ interface PostShowcaseProps {
   latestPosts: Post[];
   updatePosts: (filteredPosts: Post[]) => void;
   clearDeletablePosts: () => void;
-  deletablePosts: Post[];
+  deletablePosts: Pick<Post, "_id">[];
   isLoading: boolean;
 }
 
