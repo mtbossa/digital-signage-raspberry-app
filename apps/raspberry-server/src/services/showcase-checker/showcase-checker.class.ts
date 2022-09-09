@@ -16,7 +16,6 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
   public status = { running: false };
 
   private checkTimeout: number;
-  private postsService: Posts;
   private interval?: NodeJS.Timer;
 
   constructor(
@@ -28,7 +27,6 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
     this.app = app;
 
     this.checkTimeout = this.app.get("showcaseCheckTimeout");
-    this.postsService = this.app.service("posts");
   }
 
   async create(
@@ -53,7 +51,7 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
     const postsService = this.app.service("posts");
     const mediasService = this.app.service("medias");
 
-    const allPosts: Post[] = (await this.postsService.find({
+    const allPosts: Post[] = (await postsService.find({
       paginate: false,
     })) as Post[];
 
@@ -61,7 +59,7 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
       if (this.shouldShow(post) && !post.showing) {
         const media = await mediasService.get(post.mediaId);
         if (media.downloaded) {
-          await this.postsService.update(post._id, { ...post, showing: true });
+          await postsService.update(post._id, { ...post, showing: true });
           console.log("[ EVENT start-post ] Emitting start-post: ", { postId: post._id });
           postsService.emit("start-post", {
             _id: post._id,
@@ -71,7 +69,7 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
         }
       } else if (!this.shouldShow(post) && post.showing) {
         console.log("[ EVENT end-post ] Emitting end-post: ", { postId: post._id });
-        await this.postsService.update(post._id, { ...post, showing: false });
+        await postsService.update(post._id, { ...post, showing: false });
         postsService.emit("end-post", {
           _id: post._id,
         });

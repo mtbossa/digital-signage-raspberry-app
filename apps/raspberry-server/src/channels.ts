@@ -43,14 +43,11 @@ export default function (app: Application): void {
       if (e instanceof ClientRequestError) {
         console.log("[ SERVER DOWN WHILE SYNCING ]");
 
-        await serverStatusCheckerService.patch(null, {
-          ...serverStatusCheckerService.status,
-          server: "down",
-        });
+        serverStatusCheckerService.status.server = "down";
       }
     }
     showcaseChecker.create({});
-    serverStatusCheckerService.start();
+    serverStatusCheckerService.create({});
   });
 
   app.on("login", (authResult: any, { connection }: any): void => {

@@ -27,31 +27,33 @@ import { Posts } from "../posts/posts.class";
 import { PostsSync } from "../posts-sync/posts-sync.class";
 import { ShowcaseChecker } from "../showcase-checker/showcase-checker.class";
 
-type Data = {
-  server: "up" | "down";
-};
+interface Data {}
 
 interface ServiceOptions {}
 
-export class ServerStatusChecker implements ServiceMethods<Data> {
+export class ServerStatusChecker implements Pick<ServiceMethods<Data>, "create"> {
   app: Application;
   options: ServiceOptions;
-  public status: Data = { server: "up" };
+  status: { server: "up" | "down" } = { server: "up" };
 
   private requestTimeout: number;
-  private postsSyncService: PostsSync;
-  private channelsConnectorService: BackendChannelsConnector;
 
   constructor(options: ServiceOptions = {}, app: Application) {
     this.options = options;
     this.app = app;
 
     this.requestTimeout = this.app.get("serverCheckTimeout");
-    this.postsSyncService = this.app.service("posts-sync");
-    this.channelsConnectorService = this.app.service("backend-channels-connector");
   }
 
-  start() {
+  public async check() {
+    return await intusAPI.checkServerStatus();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async create(data: Data, params?: Params): Promise<Data> {
+    const postsSyncService = this.app.service("posts-sync");
+    const channelsConnectorService = this.app.service("backend-channels-connector");
+
     console.log("[ STARTING SERVER STATUS CHECKER ]");
 
     setInterval(async () => {
@@ -63,9 +65,10 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
         // If server status was already up, do nothing
         if (this.status.server === "up") return;
 
-        await this.patch(null, { ...this.status, server: "up" });
-        await this.channelsConnectorService.create({});
-        await this.postsSyncService.create({});
+        this.status.server = "up";
+
+        await channelsConnectorService.create({});
+        await postsSyncService.create({});
       } catch (e) {
         if (e instanceof ClientRequestError) {
           console.log("[ SERVER STATUS: DOWN ]");
@@ -73,43 +76,11 @@ export class ServerStatusChecker implements ServiceMethods<Data> {
           // If server status was already down, do nothing
           if (this.status.server === "down") return;
 
-          await this.patch(null, { ...this.status, server: "down" });
+          this.status.server = "down";
         }
       }
     }, this.requestTimeout);
-  }
 
-  public async check() {
-    return await intusAPI.checkServerStatus();
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async find(params?: Params): Promise<Data[] | Paginated<Data>> {
-    return [];
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async get(id: Id, params?: Params): Promise<Data> {
-    return this.status;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async create(data: Data, params?: Params): Promise<Data> {
     return data;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async update(id: NullableId, data: Data, params?: Params): Promise<Data> {
-    return data;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async patch(id: NullableId, data: Data, params?: Params): Promise<Data> {
-    return (this.status = data);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async remove(id: NullableId, params?: Params): Promise<Data> {
-    return this.status;
   }
 }

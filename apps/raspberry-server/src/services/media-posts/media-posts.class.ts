@@ -19,22 +19,17 @@ export class MediaPosts implements Pick<ServiceMethods<Data>, "create"> {
   app: Application;
   options: ServiceOptions;
 
-  private mediasService: Medias;
-  private postsService: Posts;
-
   constructor(options: ServiceOptions = {}, app: Application) {
     this.options = options;
     this.app = app;
-
-    this.mediasService = this.app.service("medias");
-    this.postsService = this.app.service("posts");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create(media: Data, params?: Params): Promise<Data> {
-    const showcaseChecker = this.app.service("showcase-checker");
+    const mediasService = this.app.service("medias");
+    const postsService = this.app.service("posts");
 
-    await this.mediasService.update(
+    await mediasService.update(
       media.id,
       {
         ...MediaAdapter.fromAPIToLocal(media),
@@ -46,7 +41,7 @@ export class MediaPosts implements Pick<ServiceMethods<Data>, "create"> {
 
     const res = await Promise.allSettled(
       media.posts.map(async (post: Post) => {
-        return this.postsService.update(
+        return postsService.update(
           post.id,
           {
             ...PostAdapter.fromAPIToLocal(post),
