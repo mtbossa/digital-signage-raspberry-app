@@ -7,7 +7,7 @@ RUN apt-get update && \
     ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
 
-RUN mkdir -p /intus/app /intus/public/medias /intus/config
+RUN mkdir -p /intus/app /intus/public/medias /intus/config /intus/data
 
 COPY apps/raspberry-server/build /intus/app
 COPY apps/raspberry-frontend/build /intus/public

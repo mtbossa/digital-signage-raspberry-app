@@ -11,6 +11,7 @@ services:
       - .env
     volumes:
       - ${MEDIAS_FOLDER_PATH}:/intus/public/medias
+      - ${DB_FOLDER_PATH}:/intus/data
 
   watchtower:
     image: containrrr/watchtower
