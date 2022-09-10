@@ -2,15 +2,9 @@ import "@feathersjs/transport-commons";
 
 import { HookContext } from "@feathersjs/feathers";
 
+import { ClientRequestError } from "./clients/intusAPI/intusAPI";
 import { Application } from "./declarations";
-import { Media } from "./models/medias.model";
-
-export type PostFrontendEvent = {
-  _id: number;
-  exposeTime: number;
-  media: Media;
-  currentDisplayId: number;
-};
+import { Post } from "./models/posts.model";
 
 export default function (app: Application): void {
   if (typeof app.channel !== "function") {
@@ -18,10 +12,42 @@ export default function (app: Application): void {
     return;
   }
 
+  const postsService = app.service("posts");
+  const postsSyncService = app.service("posts-sync");
+  const serverStatusCheckerService = app.service("server-status-checker");
+  const channelsConnectorService = app.service("backend-channels-connector");
+  const showcaseChecker = app.service("showcase-checker");
+
   app.on("connection", async (connection: any): Promise<void> => {
     // On a new real-time connection, add it to the anonymous channel
+    console.log("[ FRONTEND CONNECTED ]");
 
     app.channel("anonymous").join(connection);
+
+    // When initializing the system, checks connection so when frontend connects
+    // we already know if we have internet connection or not
+    try {
+      // Sets all posts to showing false, since when system is starting up, no post is showing.
+      const currentPosts = (await postsService.find({ paginate: false })) as Post[];
+      await Promise.allSettled(
+        currentPosts.map((post) =>
+          postsService.update(post._id, { ...post, showing: false })
+        )
+      );
+      await postsSyncService.create({ synced: false });
+      await channelsConnectorService.create({ channelsConnected: false });
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error("Error while initial syncing: ", e.message);
+      }
+      if (e instanceof ClientRequestError) {
+        console.log("[ SERVER DOWN WHILE SYNCING ]");
+
+        serverStatusCheckerService.status.server = "down";
+      }
+    }
+    showcaseChecker.create({});
+    serverStatusCheckerService.create({});
   });
 
   app.on("login", (authResult: any, { connection }: any): void => {
@@ -63,21 +89,9 @@ export default function (app: Application): void {
   // Here you can also add service specific event publishers
   // e.g. the publish the `users` service `created` event to the `admins` channel
   // app.service('users').publish('created', () => app.channel('admins'));
-
-  // Since syncing is global, can emit to all channels/displays
-  app.service("displays").publish("displays-sync-finish", () => {
-    return app.channel("anonymous");
-  });
-  // Since syncing is global, can emit to all channels/displays
-  app.service("posts").publish("sync-finish", (post: PostFrontendEvent) => {
-    return app.channel(`display/${post.currentDisplayId}`);
-  });
-  app.service("posts").publish("start-post", (post: PostFrontendEvent) => {
-    return app.channel(`display/${post.currentDisplayId}`);
-  });
-  app.service("posts").publish("end-post", (post: PostFrontendEvent) => {
-    return app.channel(`display/${post.currentDisplayId}`);
-  });
+  app.service("posts").publish("sync-finish", () => app.channel("anonymous"));
+  app.service("posts").publish("start-post", () => app.channel("anonymous"));
+  app.service("posts").publish("end-post", () => app.channel("anonymous"));
 
   // With the userid and email organization from above you can easily select involved users
   // app.service('messages').publish(() => {

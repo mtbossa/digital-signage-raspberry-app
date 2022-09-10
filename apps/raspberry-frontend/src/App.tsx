@@ -1,76 +1,52 @@
 import "./global.css";
 
-import { ServiceAddons } from "@feathersjs/feathers";
-import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
-import { DisplayConnect } from "@intus/raspberry-server/src/services/display-connect/display-connect.class";
-import { Posts } from "@intus/raspberry-server/src/services/posts/posts.class";
 import { useCallback, useEffect, useState } from "react";
 
 import PostShowcase from "./components/PostShowcase";
 import client from "./feathers";
 
-const postsService: Posts & ServiceAddons<Posts> = client.service("posts");
-const displayConnectService: DisplayConnect & ServiceAddons<Posts> =
-  client.service("display-connect");
+export interface Post {
+  _id: number;
+  exposeTime?: number;
+  media: Media;
+}
 
-// Path will always be /displays/1..2..n
-const getDisplayIdFromUrlPath = (pathname: string): number => {
-  const afterLastSlash = pathname.split("/")[2];
+export interface Media {
+  _id: number;
+  path: string;
+  type: string;
+}
 
-  return Number(afterLastSlash);
-};
-
-const updateDisplayPost = async (
-  post: PostFrontendEvent,
-  updatedValues: { showing?: boolean }
-) => {
-  const postDb = await postsService.get(post._id);
-
-  const updatedDisplays = postDb.displays.map(
-    (display: { _id: number; showing: boolean }) => {
-      if (display._id !== post.currentDisplayId) return display;
-
-      return { ...display, ...updatedValues };
-    }
-  );
-
-  await postsService.patch(postDb._id, {
-    ...postDb,
-    displays: updatedDisplays,
-  });
-};
+const postsService = client.service("posts");
 
 function App() {
-  const [deletablePosts, setDeletablePosts] = useState<PostFrontendEvent[]>([]);
-  const [currentPosts, setCurrentPosts] = useState<PostFrontendEvent[]>([]);
+  const [deletablePosts, setDeletablePosts] = useState<Pick<Post, "_id">[]>([]);
+  const [currentPosts, setCurrentPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const setupWebSocket = useCallback(async () => {
-    displayConnectService.create({
-      displayId: getDisplayIdFromUrlPath(window.location.pathname),
-    });
-
+  const setupWebSocket = useCallback(() => {
     postsService.on("sync-finish", (data: { status: "finish" | "failed" }) => {
+      console.log("sync-finish");
       setIsLoading(false);
     });
 
-    postsService.on("start-post", async (post: PostFrontendEvent) => {
-      setIsLoading(false);
+    postsService.on("start-post", (post: Post) => {
       setCurrentPosts((currentPosts) => {
-        return [...currentPosts!, post];
-      });
-      updateDisplayPost(post, {
-        showing: true,
+        const postAlreadyHere = currentPosts.findIndex(
+          (currentPost) => currentPost._id === post._id
+        );
+
+        if (postAlreadyHere === -1) {
+          return [...currentPosts!, post];
+        }
+
+        return currentPosts;
       });
     });
 
-    postsService.on("end-post", async (removedPost: PostFrontendEvent) => {
-      setIsLoading(false);
+    postsService.on("end-post", (removedPost: Pick<Post, "_id">) => {
       setDeletablePosts((currentDeletablePosts) => {
         return [...currentDeletablePosts, removedPost];
-      });
-      updateDisplayPost(removedPost, {
-        showing: false,
       });
     });
   }, []);
@@ -79,7 +55,7 @@ function App() {
     setupWebSocket();
   }, [setupWebSocket]);
 
-  const updatePosts = useCallback((updatedPosts: PostFrontendEvent[]) => {
+  const updatePosts = useCallback((updatedPosts: Post[]) => {
     setCurrentPosts([...updatedPosts]);
   }, []);
 
@@ -95,8 +71,6 @@ function App() {
         updatePosts={updatePosts}
         clearDeletablePosts={clearDeletablePosts}
         isLoading={isLoading}
-        displayWidth={1920}
-        displayHeight={1080}
       />
     </div>
   );

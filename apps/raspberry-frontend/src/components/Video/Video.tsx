@@ -1,10 +1,10 @@
-import { PostFrontendEvent } from "@intus/raspberry-server/src/channels";
 import React, { SyntheticEvent } from "react";
 
-import { appUrl } from "../../feathers";
+import { Post } from "../../App";
+import { port } from "../../feathers";
 
 interface VideoProps {
-  showingPost: PostFrontendEvent;
+  showingPost: Post;
   onVideoEnded: (event: SyntheticEvent<HTMLVideoElement, Event>) => void;
 }
 
@@ -14,7 +14,7 @@ const Video: React.ForwardRefRenderFunction<HTMLVideoElement, VideoProps> = (
 ) => {
   return (
     <video
-      src={`${appUrl}/medias/${showingPost.media.path}`}
+      src={`http://localhost:${port}/medias/${showingPost.media.path}`}
       ref={ref}
       muted
       autoPlay

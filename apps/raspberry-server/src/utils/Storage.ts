@@ -18,4 +18,12 @@ export default class Storage {
   async delete(path: string) {
     await unlink(this.makeCompletePath(path));
   }
+
+  static async fileExists(path: string) {
+    return new Promise((resolve) => {
+      fs.access(path, fs.constants.F_OK, (error) => {
+        resolve(!error);
+      });
+    });
+  }
 }

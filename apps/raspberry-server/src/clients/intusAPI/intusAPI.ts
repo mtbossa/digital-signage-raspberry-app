@@ -8,6 +8,34 @@ interface PostResponse {
   data: Post[];
 }
 
+interface PostExpiredResponse {
+  data: PostExpired[];
+}
+
+export interface PostExpired {
+  post_id: number;
+  media_id: number;
+  canDeleteMedia: boolean;
+}
+
+export type AvailableNotifications = "PostCreated" | "PostDeleted";
+
+export interface Notification {
+  id: string;
+  type: AvailableNotifications;
+  [key: string]: any;
+}
+
+export interface PostDeletedNotification extends Notification {
+  post_id: number;
+  media_id: number;
+  canDeleteMedia: boolean;
+}
+
+export interface PostCreatedNotification extends Notification {
+  post: Post;
+}
+
 // Media here is mandatory, since we always send the post with the media from the backend
 export interface Post {
   id: number;
@@ -17,7 +45,7 @@ export interface Post {
   end_time: string;
   expose_time: number | null;
   media: Media;
-  showing: boolean;
+  expired: boolean;
   recurrence?: Recurrence;
 }
 
@@ -33,14 +61,7 @@ export interface Media {
   path: string;
   type: string;
   filename: string;
-}
-export interface Display {
-  id: number;
-  name: string;
-  size: number;
-  width: number;
-  height: number;
-  touch: boolean;
+  canBeDeleted?: boolean;
 }
 
 export class ClientRequestError extends InternalError {
@@ -57,10 +78,8 @@ export class IntusAPIResponseError extends InternalError {
 }
 
 export class IntusAPI {
-  readonly raspberryId = process.env["RASPBERRY_ID"];
-  readonly storeId = process.env["STORE_ID"];
-  readonly storeApiToken = process.env["STORE_API_TOKEN"];
-  readonly apiToken = process.env["RASPBERRY_API_TOKEN"];
+  readonly displayId = process.env["DISPLAY_ID"];
+  readonly apiToken = process.env["DISPLAY_API_TOKEN"];
   readonly apiUrl = process.env["API_URL"];
 
   constructor(
@@ -73,7 +92,7 @@ export class IntusAPI {
       const response = await this.request.get<Stream>(
         `${this.apiUrl}/api/media/${filename}/download`,
         {
-          headers: { Authorization: `Bearer ${this.storeApiToken}` },
+          headers: { Authorization: `Bearer ${this.apiToken}` },
           responseType: "stream",
         }
       );
@@ -100,12 +119,16 @@ export class IntusAPI {
     }
   }
 
-  public async fetchDisplayPosts(displayId: number): Promise<Post[]> {
+  public async fetchExpiredPosts(): Promise<PostExpired[]> {
     try {
-      const response = await this.request.get<PostResponse>(
-        `${this.apiUrl}/api/displays/${displayId}/posts`,
+      const response = await this.request.get<PostExpiredResponse>(
+        `${this.apiUrl}/api/displays/${this.displayId}/posts`,
         {
-          headers: { Authorization: `Bearer ${this.storeApiToken}` },
+          headers: { Authorization: `Bearer ${this.apiToken}` },
+          params: {
+            fromApp: true,
+            expired: true,
+          },
         }
       );
 
@@ -122,16 +145,16 @@ export class IntusAPI {
     }
   }
 
-  public async fetchStoreDisplays(): Promise<Display[]> {
+  public async fetchRaspberryPosts(): Promise<Post[]> {
     try {
-      const response = await this.request.get<Display[]>(
-        `${this.apiUrl}/api/stores/${this.storeId}/displays`,
+      const response = await this.request.get<PostResponse>(
+        `${this.apiUrl}/api/displays/${this.displayId}/posts`,
         {
-          headers: { Authorization: `Bearer ${this.storeApiToken}` },
+          headers: { Authorization: `Bearer ${this.apiToken}` },
         }
       );
 
-      return response.data;
+      return response.data.data;
     } catch (err: unknown) {
       if (err instanceof Error && HTTPUtil.Request.isRequestError(err)) {
         const error = HTTPUtil.Request.extractErrorData(err);

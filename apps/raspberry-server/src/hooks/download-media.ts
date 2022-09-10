@@ -4,15 +4,18 @@ import { Hook, HookContext } from "@feathersjs/feathers";
 import path from "path";
 
 import intusAPI from "../clients/intusAPI/intusAPI";
-import { Data as MediaData, Medias } from "../services/medias/medias.class";
+import { Media } from "../models/medias.model";
+import { Medias } from "../services/medias/medias.class";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (options = {}): Hook => {
   return async (context: HookContext): Promise<HookContext> => {
     const mediasService: Medias = context.app.service("medias");
-    const media: MediaData = context.data;
+    const media: Media = context.data;
 
     const savePath = path.resolve(context.app.get("medias"), media.path);
+
+    if (media.downloaded) return context;
 
     try {
       console.log("DOWNLOADING MEDIA");

@@ -1,23 +1,27 @@
-import createOrUpdatePosts from "../../hooks/create-or-update-posts";
+import { HooksObject } from "@feathersjs/feathers";
+
+import checkMediaDownloaded from "../../hooks/check-media-downloaded";
+import convertStringIdToNumber from "../../hooks/convert-string-id-to-number";
 import downloadMedia from "../../hooks/download-media";
+import removeMediaFile from "../../hooks/remove-media-file";
 
 export default {
   before: {
-    all: [],
+    all: [convertStringIdToNumber()],
     find: [],
     get: [],
-    create: [],
-    update: [],
+    create: [checkMediaDownloaded()],
+    update: [checkMediaDownloaded()],
     patch: [],
-    remove: [],
+    remove: [removeMediaFile()],
   },
 
   after: {
     all: [],
     find: [],
     get: [],
-    create: [downloadMedia(), createOrUpdatePosts()],
-    update: [createOrUpdatePosts()],
+    create: [],
+    update: [downloadMedia()],
     patch: [],
     remove: [],
   },

@@ -1,8 +1,11 @@
+import { HooksObject } from "@feathersjs/feathers";
+
+import convertStringIdToNumber from "../../hooks/convert-string-id-to-number";
 import emitShowing from "../../hooks/emit-showing";
 
 export default {
   before: {
-    all: [],
+    all: [convertStringIdToNumber()],
     find: [],
     get: [],
     create: [],
@@ -15,10 +18,10 @@ export default {
     all: [],
     find: [],
     get: [],
-    create: [emitShowing()],
-    update: [emitShowing()],
+    create: [],
+    update: [],
     patch: [],
-    remove: [],
+    remove: [emitShowing()],
   },
 
   error: {

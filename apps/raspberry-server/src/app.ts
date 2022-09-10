@@ -16,7 +16,6 @@ import channels from "./channels";
 import { Application } from "./declarations";
 import logger from "./logger";
 import middleware from "./middleware";
-import mongoose from "./mongoose";
 import services from "./services";
 // Don't remove this comment. It's needed to format import lines nicely.
 
@@ -38,15 +37,12 @@ app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Host the public folder
-app.use("/static", express.static(path.resolve(app.get("public"), "static")));
-app.use("/medias", express.static(app.get("medias")));
-app.use("/*", express.static(app.get("public")));
+app.use(express.static(app.get("medias")));
+app.use(express.static(app.get("public")));
 
 // Set up Plugins and providers
 app.configure(express.rest());
 app.configure(socketio());
-
-app.configure(mongoose);
 
 // Configure other middleware (see `middleware/index.ts`)
 app.configure(middleware);
