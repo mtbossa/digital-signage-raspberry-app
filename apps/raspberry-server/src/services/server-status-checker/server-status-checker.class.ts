@@ -21,6 +21,7 @@ import intusAPI, {
 } from "../../clients/intusAPI/intusAPI";
 import { Media, Post } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
+import logger from "../../logger";
 import { Medias } from "../../services/medias/medias.class";
 import { BackendChannelsConnector } from "../backend-channels-connector/backend-channels-connector.class";
 import { Posts } from "../posts/posts.class";
@@ -54,13 +55,12 @@ export class ServerStatusChecker implements Pick<ServiceMethods<Data>, "create">
     const postsSyncService = this.app.service("posts-sync");
     const channelsConnectorService = this.app.service("backend-channels-connector");
 
-    console.log("[ STARTING SERVER STATUS CHECKER ]");
-
+    logger.info("Starting Server Status Checker");
     setInterval(async () => {
       try {
-        console.log("[ CHECKING SERVER STATUS ]");
+        logger.info("Checking server status");
         await this.check();
-        console.log("[ SERVER STATUS: UP ]");
+        logger.info("Server status up");
 
         // If server status was already up, do nothing
         if (this.status.server === "up") return;
@@ -70,8 +70,10 @@ export class ServerStatusChecker implements Pick<ServiceMethods<Data>, "create">
         await channelsConnectorService.create({});
         await postsSyncService.create({});
       } catch (e) {
+        logger.warn("Error while checking server status");
+        logger.error(e);
         if (e instanceof ClientRequestError) {
-          console.log("[ SERVER STATUS: DOWN ]");
+          logger.info("e instanceof ClientRequestError = Server status down");
 
           // If server status was already down, do nothing
           if (this.status.server === "down") return;

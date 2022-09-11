@@ -1,11 +1,53 @@
-import { createLogger, format, transports } from "winston";
+import { createLogger, format, Logger, transports } from "winston";
 
-// Configure the Winston logger. For the complete documentation see https://github.com/winstonjs/winston
-const logger = createLogger({
-  // To see more detailed errors, change this to 'debug'
-  level: "info",
-  format: format.combine(format.splat(), format.simple()),
-  transports: [new transports.Console()],
+const logsFolder = "./logs";
+let logger: Logger;
+
+const myFormat = format.printf(({ level, message, timestamp }) => {
+  return `${timestamp} - ${level}: ${message}`;
 });
+
+if (process.env.NODE_ENV === "development") {
+  logger = createLogger({
+    level: "debug",
+    format: format.combine(
+      format.errors({ stack: true }),
+      format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
+      format.colorize(),
+      format.align(),
+      myFormat
+    ),
+    transports: [
+      new transports.Console({ handleExceptions: true }),
+      new transports.File({
+        filename: `${logsFolder}/errors.log`,
+        level: "error",
+      }),
+    ],
+    exceptionHandlers: [
+      new transports.File({ filename: `${logsFolder}/exceptions.log` }),
+    ],
+    exitOnError: false,
+  });
+} else {
+  logger = createLogger({
+    level: "info",
+    format: format.combine(format.errors({ stack: true }), format.json()),
+    transports: [
+      new transports.Console({
+        format: format.combine(format.colorize(), format.simple()),
+        handleExceptions: true,
+      }),
+      new transports.File({
+        filename: `${logsFolder}/errors.log`,
+        level: "error",
+      }),
+    ],
+    exceptionHandlers: [
+      new transports.File({ filename: `${logsFolder}/exceptions.log` }),
+    ],
+    exitOnError: false,
+  });
+}
 
 export default logger;

@@ -4,6 +4,7 @@ import { HookContext } from "@feathersjs/feathers";
 
 import { ClientRequestError } from "./clients/intusAPI/intusAPI";
 import { Application } from "./declarations";
+import logger from "./logger";
 import { Post } from "./models/posts.model";
 
 export default function (app: Application): void {
@@ -11,43 +12,15 @@ export default function (app: Application): void {
     // If no real-time functionality has been configured just return
     return;
   }
-
-  const postsService = app.service("posts");
-  const postsSyncService = app.service("posts-sync");
-  const serverStatusCheckerService = app.service("server-status-checker");
-  const channelsConnectorService = app.service("backend-channels-connector");
-  const showcaseChecker = app.service("showcase-checker");
+  const startupService = app.service("startup");
 
   app.on("connection", async (connection: any): Promise<void> => {
     // On a new real-time connection, add it to the anonymous channel
-    console.log("[ FRONTEND CONNECTED ]");
+    logger.info("Frontend connected");
 
     app.channel("anonymous").join(connection);
 
-    // When initializing the system, checks connection so when frontend connects
-    // we already know if we have internet connection or not
-    try {
-      // Sets all posts to showing false, since when system is starting up, no post is showing.
-      const currentPosts = (await postsService.find({ paginate: false })) as Post[];
-      await Promise.allSettled(
-        currentPosts.map((post) =>
-          postsService.update(post._id, { ...post, showing: false })
-        )
-      );
-      await postsSyncService.create({ synced: false });
-      await channelsConnectorService.create({ channelsConnected: false });
-    } catch (e) {
-      if (e instanceof Error) {
-        console.error("Error while initial syncing: ", e.message);
-      }
-      if (e instanceof ClientRequestError) {
-        console.log("[ SERVER DOWN WHILE SYNCING ]");
-
-        serverStatusCheckerService.status.server = "down";
-      }
-    }
-    showcaseChecker.create({});
-    serverStatusCheckerService.create({});
+    startupService.create({});
   });
 
   app.on("login", (authResult: any, { connection }: any): void => {
