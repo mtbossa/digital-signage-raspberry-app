@@ -13,6 +13,7 @@ import {
   PostDeletedNotification,
 } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
+import logger from "../../logger";
 import { Medias } from "../medias/medias.class";
 import { Posts } from "../posts/posts.class";
 
@@ -36,7 +37,7 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     // Only won't be connected to the channels if when the system started, there was no connection to the server.
     if (this.status.channelsConnected) return this.status;
 
-    console.log("[ CONNECTING TO LARAVEL CHANNELS ]");
+    logger.info("Connecting to Laravel WebSocket channels");
 
     const authorizationToken: string = this.app.get("displayAPIToken");
     const apiUrl: string = this.app.get("apiUrl");

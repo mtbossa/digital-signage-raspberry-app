@@ -2,6 +2,7 @@ import { Id, NullableId, Paginated, Params, ServiceMethods } from "@feathersjs/f
 
 import { ClientRequestError } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
+import logger from "../../logger";
 import { Post } from "../../models/posts.model";
 
 interface ServiceOptions {}
@@ -34,11 +35,10 @@ export class Startup implements Pick<ServiceMethods<any>, "create"> {
       await postsSyncService.create({ synced: false });
       await channelsConnectorService.create({ channelsConnected: false });
     } catch (e) {
-      if (e instanceof Error) {
-        console.error("Error while initial syncing: ", e.message);
-      }
+      logger.warn("Error while inital sync");
+      logger.error(e);
       if (e instanceof ClientRequestError) {
-        console.log("[ SERVER DOWN WHILE SYNCING ]");
+        logger.warn("e instanceof ClientRequestError = Server status down");
 
         serverStatusCheckerService.status.server = "down";
       }

@@ -28,8 +28,8 @@ export default (options = {}): Hook => {
       });
     } catch (e) {
       // TODO post to API that media download failed
-      logger.error(`Error while downloading media: ${media.filename}`);
-      console.error(e);
+      logger.warn(`Error while downloading media: ${media.filename}`);
+      logger.error(e);
     }
 
     return context;

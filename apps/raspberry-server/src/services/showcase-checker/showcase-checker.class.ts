@@ -2,6 +2,7 @@ import { Id, NullableId, Paginated, Params, ServiceMethods } from "@feathersjs/f
 
 import { Recurrence } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
+import logger from "../../logger";
 import { Post } from "../../models/posts.model";
 import { DateProvider } from "../../providers/DateProvider";
 import { Posts } from "../posts/posts.class";
@@ -35,12 +36,11 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
   ): Promise<Data | Data[]> {
     if (this.status.running) return this.status;
 
-    console.log("[ STARTING CHECKING POSTS SHOWCASE ]");
-
+    logger.info("Starting showcase checker");
     this.status.running = true;
 
     this.interval = setInterval(async () => {
-      console.log("[ CHECKING POSTS SHOWCASE ]");
+      logger.info("Checking all posts showcase");
       await this.checkAllPosts();
     }, this.checkTimeout);
 
@@ -54,7 +54,7 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
     const media = await mediasService.get(post.mediaId);
     if (media.downloaded) {
       await postsService.update(post._id, { ...post, showing: true });
-      console.log("[ EVENT start-post ] Emitting start-post: ", { postId: post._id });
+      logger.info("Emitting start-post: ", { postId: post._id });
       postsService.emit("start-post", {
         _id: post._id,
         exposeTime: post.exposeTime,
@@ -66,7 +66,7 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
   private async emitEndPost(post: Post) {
     const postsService = this.app.service("posts");
 
-    console.log("[ EVENT end-post ] Emitting end-post: ", { postId: post._id });
+    logger.info("Emitting end-post: ", { postId: post._id });
     await postsService.update(post._id, { ...post, showing: false });
     postsService.emit("end-post", {
       _id: post._id,
@@ -104,7 +104,7 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
 
     clearInterval(this.interval);
 
-    console.log("[ STOPPING CHECKING POSTS SHOWCASE ]");
+    logger.info("Stopping showcase checker");
   }
 
   public shouldShow(

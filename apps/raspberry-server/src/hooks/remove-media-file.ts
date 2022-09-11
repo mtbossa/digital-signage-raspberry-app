@@ -3,6 +3,7 @@
 import { Hook, HookContext } from "@feathersjs/feathers";
 import path from "path";
 
+import logger from "../logger";
 import { Medias } from "../services/medias/medias.class";
 import Storage from "../utils/Storage";
 
@@ -18,7 +19,8 @@ export default (options = {}): Hook => {
     try {
       await storage.delete(path.resolve(context.app.get("medias"), media.path));
     } catch (e) {
-      console.error("Error while deleting media file: ", e);
+      logger.warn("Error while deleting media file");
+      logger.error(e);
     }
     return context;
   };

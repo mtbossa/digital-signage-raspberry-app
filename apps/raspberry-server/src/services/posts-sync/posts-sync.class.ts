@@ -6,6 +6,7 @@ import intusAPI, {
   PostExpired,
 } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
+import logger from "../../logger";
 import { Post } from "../../models/posts.model";
 import { MediaPosts } from "../media-posts/media-posts.class";
 import { Medias } from "../medias/medias.class";
@@ -30,19 +31,20 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
     const showcaseChecker = this.app.service("showcase-checker");
     const postsService = this.app.service("posts");
 
-    console.log("[ SYNCING POSTS ]");
+    logger.info("Starting to sync posts");
     try {
       await this.syncPosts();
       this.status = { synced: true };
     } catch (e) {
-      console.log("[ SYNC FINISH WITH ERROR ]");
+      logger.warn("Error while syncing posts");
+      logger.error(e);
       postsService.emit("sync-finish", { status: "finish" });
       await showcaseChecker.checkAllPosts();
 
       throw e;
     }
 
-    console.log("[ SYNC FINISH ]");
+    logger.info("Posts syncing finish with success");
     postsService.emit("sync-finish", { status: "finish" });
 
     return this.status;
