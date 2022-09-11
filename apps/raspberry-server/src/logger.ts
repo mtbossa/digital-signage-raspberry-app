@@ -6,7 +6,11 @@ let logger: Logger;
 if (process.env.NODE_ENV === "development") {
   logger = createLogger({
     level: "debug",
-    format: format.combine(format.splat(), format.simple()),
+    format: format.combine(
+      format.errors({ stack: true }),
+      format.splat(),
+      format.simple()
+    ),
     transports: [
       new transports.Console({ handleExceptions: true }),
       new transports.File({
@@ -22,7 +26,7 @@ if (process.env.NODE_ENV === "development") {
 } else {
   logger = createLogger({
     level: "info",
-    format: format.json(),
+    format: format.combine(format.errors({ stack: true }), format.json()),
     transports: [
       new transports.Console({
         format: format.combine(format.colorize(), format.simple()),
