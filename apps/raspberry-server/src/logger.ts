@@ -14,6 +14,7 @@ if (process.env.NODE_ENV === "development") {
       format.errors({ stack: true }),
       format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
       format.colorize(),
+      format.align(),
       myFormat
     ),
     transports: [
