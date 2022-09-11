@@ -1,6 +1,5 @@
 import { createLogger, format, Logger, transports } from "winston";
 
-const logsFolder = "./logs";
 let logger: Logger;
 
 const myFormat = format.printf(({ level, message, timestamp }) => {
@@ -8,6 +7,7 @@ const myFormat = format.printf(({ level, message, timestamp }) => {
 });
 
 if (process.env.NODE_ENV === "development") {
+  const logsFolder = "./logs";
   logger = createLogger({
     level: "debug",
     format: format.combine(
@@ -30,6 +30,7 @@ if (process.env.NODE_ENV === "development") {
     exitOnError: false,
   });
 } else {
+  const logsFolder = "/intus/logs";
   logger = createLogger({
     level: "info",
     format: format.combine(format.errors({ stack: true }), format.json()),
