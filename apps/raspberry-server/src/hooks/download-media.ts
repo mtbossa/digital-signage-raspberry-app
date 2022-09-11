@@ -4,6 +4,7 @@ import { Hook, HookContext } from "@feathersjs/feathers";
 import path from "path";
 
 import intusAPI from "../clients/intusAPI/intusAPI";
+import logger from "../logger";
 import { Media } from "../models/medias.model";
 import { Medias } from "../services/medias/medias.class";
 
@@ -18,16 +19,17 @@ export default (options = {}): Hook => {
     if (media.downloaded) return context;
 
     try {
-      console.log("DOWNLOADING MEDIA");
+      logger.info(`Starting to download media: ${media.filename}`);
       await intusAPI.downloadMedia(media.filename, savePath);
-      console.log("MEDIA DOWNLOAD FINISH");
+      logger.info(`Media successfully downloaded: ${media.filename}`);
       await mediasService.update(media._id, {
         ...media,
         downloaded: true,
       });
     } catch (e) {
       // TODO post to API that media download failed
-      console.error(e);
+      logger.warn(`Error while downloading media: ${media.filename}`);
+      logger.error(e);
     }
 
     return context;

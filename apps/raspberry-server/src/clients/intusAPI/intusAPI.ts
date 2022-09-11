@@ -1,5 +1,6 @@
 import type { Stream } from "stream";
 
+import logger from "../../logger";
 import { InternalError } from "../../utils/errors/internal-error";
 import * as HTTPUtil from "../../utils/Request";
 import Storage from "../../utils/Storage";
@@ -101,11 +102,11 @@ export class IntusAPI {
 
       return new Promise((resolve, reject) => {
         response.data.on("end", () => {
-          console.log(`[ RESOLVE END - MEDIA DOWNLOAD FINISH ${filename}]`);
+          logger.debug(`response.data.on("end") received: ${filename}`);
           resolve(this.storage.makeCompletePath(pathToSave));
         });
         response.data.on("error", (err) => {
-          console.log("rejected err", err);
+          logger.debug(`response.data.on("error") received: ${filename}`);
           reject(err);
         });
       });

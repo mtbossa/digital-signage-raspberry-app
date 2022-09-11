@@ -12,6 +12,7 @@ services:
     volumes:
       - ${MEDIAS_FOLDER_PATH}:/intus/public/medias
       - ${DB_FOLDER_PATH}:/intus/data
+      - ${LOGS_FOLDER_PATH}:/intus/logs
 
   watchtower:
     image: containrrr/watchtower
