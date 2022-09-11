@@ -54,7 +54,7 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
     const media = await mediasService.get(post.mediaId);
     if (media.downloaded) {
       await postsService.update(post._id, { ...post, showing: true });
-      logger.info("Emitting start-post: ", { postId: post._id });
+      logger.info(`Emitting start-post: postId: ${post._id}`);
       postsService.emit("start-post", {
         _id: post._id,
         exposeTime: post.exposeTime,
@@ -66,7 +66,7 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
   private async emitEndPost(post: Post) {
     const postsService = this.app.service("posts");
 
-    logger.info("Emitting end-post: ", { postId: post._id });
+    logger.info(`Emitting end-post: postId: ${post._id}`);
     await postsService.update(post._id, { ...post, showing: false });
     postsService.emit("end-post", {
       _id: post._id,
