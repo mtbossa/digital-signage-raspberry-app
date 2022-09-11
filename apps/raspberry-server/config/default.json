@@ -9,14 +9,9 @@
   },
   "serverCheckTimeout": 5000,
   "showcaseCheckTimeout": 5000,
-  "dbHost": "DB_HOST",
-  "dbPort": "DB_PORT",
-  "dbUser": "DB_USER",
-  "dbPassword": "DB_PASSWORD",
   "dbName": "DB_NAME",
-  "raspberryId": "RASPBERRY_ID",
+  "displayId": "DISPLAY_ID",
+  "displayAPIToken": "DISPLAY_API_TOKEN",
   "apiUrl": "API_URL",
-  "raspberryAPIToken": "RASPBERRY_API_TOKEN",
-  "storeAPIToken": "STORE_API_TOKEN",
-  "storeId": "STORE_ID"
+  "nedb": "../data"
 }

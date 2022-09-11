@@ -78,4 +78,5 @@ Learn more about the power of Turborepo:
 
 Building Dockerfile for production:
 
-docker build -f Dockerfile.production -t intus:latest .
+yarn build
+docker build -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging .

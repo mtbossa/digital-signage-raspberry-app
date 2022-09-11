@@ -8,10 +8,13 @@ node_modules
 # testing
 coverage
 
-# next.js
-.next/
-out/
+# Compiled output
+out
 build
+dist
+tmp
+out-tsc
+bazel-out
 
 # misc
 .DS_Store
@@ -30,5 +33,31 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.history/*
+
+# profiling files
+chrome-profiler-events*.json
+
+# Miscellaneous
+.sass-cache/
+/connect.lock
+/libpeerconnection.log
+testem.log
+/typings
+
 # turbo
 .turbo
+
+# System files
+.DS_Store
+Thumbs.db

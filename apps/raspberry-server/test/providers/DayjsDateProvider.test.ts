@@ -16,24 +16,20 @@ describe("Dayjs provider", () => {
           it("Compare date: 2022-01-02", () => {
             const dateToCompare = "2022-01-02";
 
-            expect(dayjsDateProvider.isDateAfterToday(dateToCompare)).toBe(
-              true
-            );
+            expect(dayjsDateProvider.isDateAfterToday(dateToCompare)).toBe(true);
           });
         });
         describe("Should return false when", () => {
-          it(`Compare date: ${nowFakeDate}`, () => {
-            expect(
-              dayjsDateProvider.isDateAfterToday(nowCompleteFakeDate)
-            ).toBe(false);
+          it(`Compare date: ${nowFakeDate} 05:35:00`, () => {
+            expect(dayjsDateProvider.isDateAfterToday(`${nowFakeDate} 05:35:00`)).toBe(
+              false
+            );
           });
 
           it("Compare date: 2021-12-31", () => {
             const dateToCompare = "2021-12-31";
 
-            expect(dayjsDateProvider.isDateAfterToday(dateToCompare)).toBe(
-              false
-            );
+            expect(dayjsDateProvider.isDateAfterToday(dateToCompare)).toBe(false);
           });
         });
       });
@@ -43,24 +39,20 @@ describe("Dayjs provider", () => {
           it("Compare date: 2021-12-31", () => {
             const dateToCompare = "2021-12-31";
 
-            expect(dayjsDateProvider.isDateBeforeToday(dateToCompare)).toBe(
-              true
-            );
+            expect(dayjsDateProvider.isDateBeforeToday(dateToCompare)).toBe(true);
           });
         });
         describe("Should return false when", () => {
           it(`Compare date: ${nowFakeDate}`, () => {
-            expect(
-              dayjsDateProvider.isDateBeforeToday(nowCompleteFakeDate)
-            ).toBe(false);
+            expect(dayjsDateProvider.isDateBeforeToday(`${nowFakeDate} 05:29:00`)).toBe(
+              false
+            );
           });
 
           it(`Compare date: 2022-01-02`, () => {
             const dateToCompare = "2022-01-02";
 
-            expect(dayjsDateProvider.isDateBeforeToday(dateToCompare)).toBe(
-              false
-            );
+            expect(dayjsDateProvider.isDateBeforeToday(dateToCompare)).toBe(false);
           });
         });
       });
@@ -70,33 +62,25 @@ describe("Dayjs provider", () => {
           it("Start Time: 04:40:00 | End Time: 06:50:00", () => {
             const startTime = "04:40:00";
             const endTime = "06:50:00";
-            expect(
-              dayjsDateProvider.isNowBetweenTimes(startTime, endTime)
-            ).toBe(true);
+            expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(true);
           });
 
           it("Start Time: 05:29:00 | End Time: 05:31:00", () => {
             const startTime = "05:29:00";
             const endTime = "05:31:00";
-            expect(
-              dayjsDateProvider.isNowBetweenTimes(startTime, endTime)
-            ).toBe(true);
+            expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(true);
           });
 
           it("Start Time: 04:29:00 | End Time: 06:31:00", () => {
             const startTime = "04:29:00";
             const endTime = "06:31:00";
-            expect(
-              dayjsDateProvider.isNowBetweenTimes(startTime, endTime)
-            ).toBe(true);
+            expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(true);
           });
 
           it("Start Time: 05:30:00 | End Time: 05:31:00", () => {
             const startTime = "05:30:00";
             const endTime = "05:31:00";
-            expect(
-              dayjsDateProvider.isNowBetweenTimes(startTime, endTime)
-            ).toBe(true);
+            expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(true);
           });
         });
 
@@ -104,41 +88,31 @@ describe("Dayjs provider", () => {
           it(`Start Time: 06:29:00 | End Time: 06:31:00`, () => {
             const startTime = "06:29:00";
             const endTime = "06:31:00";
-            expect(
-              dayjsDateProvider.isNowBetweenTimes(startTime, endTime)
-            ).toBe(false);
+            expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(false);
           });
 
           it(`Start Time: 04:29:00 | End Time: 04:31:00`, () => {
             const startTime = "04:29:00";
             const endTime = "04:31:00";
-            expect(
-              dayjsDateProvider.isNowBetweenTimes(startTime, endTime)
-            ).toBe(false);
+            expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(false);
           });
 
           it(`Start Time: 05:31:00 | End Time: 05:40:00`, () => {
             const startTime = "05:31:00";
             const endTime = "05:40:00";
-            expect(
-              dayjsDateProvider.isNowBetweenTimes(startTime, endTime)
-            ).toBe(false);
+            expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(false);
           });
 
           it(`Start Time: 05:20:00 | End Time: 05:29:00`, () => {
             const startTime = "05:20:00";
             const endTime = "05:29:00";
-            expect(
-              dayjsDateProvider.isNowBetweenTimes(startTime, endTime)
-            ).toBe(false);
+            expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(false);
           });
 
           it(`Start Time: 05:25:00 | End Time: 05:30:00`, () => {
             const startTime = "05:25:00";
             const endTime = "05:30:00";
-            expect(
-              dayjsDateProvider.isNowBetweenTimes(startTime, endTime)
-            ).toBe(false);
+            expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(false);
           });
         });
       });
@@ -158,9 +132,7 @@ describe("Dayjs provider", () => {
 
         const startTime = "23:15:00";
         const endTime = "00:30:00";
-        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(
-          true
-        );
+        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(true);
       });
 
       it(`Now time: 2022-01-01 00:00:00 | Start Time: 23:15:00 | End Time: 23:14:00`, () => {
@@ -171,9 +143,7 @@ describe("Dayjs provider", () => {
 
         const startTime = "23:15:00";
         const endTime = "23:14:00";
-        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(
-          true
-        );
+        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(true);
       });
       it(`Now time: 2022-01-01 23:59:59 | Start Time: 23:25:00 | End Time: 00:30:00`, () => {
         const nowFakeTime = "23:59:59";
@@ -184,9 +154,7 @@ describe("Dayjs provider", () => {
 
         const startTime = "23:15:00";
         const endTime = "00:30:00";
-        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(
-          true
-        );
+        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(true);
       });
     });
     describe("Should return false", () => {
@@ -199,9 +167,7 @@ describe("Dayjs provider", () => {
 
         const startTime = "22:25:00";
         const endTime = "01:30:00";
-        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(
-          false
-        );
+        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(false);
       });
 
       it(`Now time: 2022-01-01 01:31:00 | Start Time: 22:25:00 | End Time: 01:30:00`, () => {
@@ -213,9 +179,7 @@ describe("Dayjs provider", () => {
 
         const startTime = "22:25:00";
         const endTime = "01:30:00";
-        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(
-          false
-        );
+        expect(dayjsDateProvider.isNowBetweenTimes(startTime, endTime)).toBe(false);
       });
     });
   });

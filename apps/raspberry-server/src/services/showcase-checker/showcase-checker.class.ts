@@ -1,146 +1,140 @@
-import {
-	Id,
-	NullableId,
-	Paginated,
-	Params,
-	ServiceMethods,
-} from "@feathersjs/feathers";
+import { Id, NullableId, Paginated, Params, ServiceMethods } from "@feathersjs/feathers";
+
+import { Recurrence } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
 import { Post } from "../../models/posts.model";
 import { DateProvider } from "../../providers/DateProvider";
 import { Posts } from "../posts/posts.class";
 
-interface Data {
-	running: boolean;
-}
+interface Data {}
 
 interface ServiceOptions {}
 
-export class ShowcaseChecker implements ServiceMethods<Data> {
-	app: Application;
-	options: ServiceOptions;
-	public status: Data = { running: false };
+export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
+  app: Application;
+  options: ServiceOptions;
+  public status = { running: false };
 
-	private checkTimeout: number;
-	private postsService: Posts;
-	private interval?: NodeJS.Timer;
+  private checkTimeout: number;
+  private interval?: NodeJS.Timer;
 
-	constructor(
-		options: ServiceOptions = {},
-		app: Application,
-		private dateProvider: DateProvider
-	) {
-		this.options = options;
-		this.app = app;
+  constructor(
+    options: ServiceOptions = {},
+    app: Application,
+    private dateProvider: DateProvider
+  ) {
+    this.options = options;
+    this.app = app;
 
-		this.checkTimeout = this.app.get("showcaseCheckTimeout");
-		this.postsService = this.app.service("posts");
-	}
+    this.checkTimeout = this.app.get("showcaseCheckTimeout");
+  }
 
-	async start() {
-		if (this.status.running) return;
+  async create(
+    data: Partial<Data> | Partial<Data>[],
+    params?: Params | undefined
+  ): Promise<Data | Data[]> {
+    if (this.status.running) return this.status;
 
-		console.log("[ STARTING CHECKING POSTS SHOWCASE ]");
+    console.log("[ STARTING CHECKING POSTS SHOWCASE ]");
 
-		await this.patch(null, { running: true });
+    this.status.running = true;
 
-		this.interval = setInterval(async () => {
-			console.log("[ CHECKING POSTS SHOWCASE ]");
+    this.interval = setInterval(async () => {
+      console.log("[ CHECKING POSTS SHOWCASE ]");
+      await this.checkPosts();
+    }, this.checkTimeout);
 
-			const allPosts: Post[] = (await this.postsService.find({
-				paginate: false,
-			})) as Post[];
+    return this.status;
+  }
 
-			allPosts.forEach(async post => {
-				// if (this.shouldShow(post) && !post.showing) {
-				//   await this.postsService.update(post._id, { ...post, showing: true });
-				// } else if (!this.shouldShow(post) && post.showing) {
-				//   await this.postsService.update(post._id, { ...post, showing: false });
-				// }
-			});
-		}, this.checkTimeout);
-	}
+  public async checkPosts() {
+    const postsService = this.app.service("posts");
+    const mediasService = this.app.service("medias");
 
-	async stop() {
-		if (!this.status.running) return;
+    const allPosts: Post[] = (await postsService.find({
+      paginate: false,
+    })) as Post[];
 
-		await this.patch(null, { running: false });
+    allPosts.forEach(async (post) => {
+      if (this.shouldShow(post) && !post.showing) {
+        const media = await mediasService.get(post.mediaId);
+        if (media.downloaded) {
+          await postsService.update(post._id, { ...post, showing: true });
+          console.log("[ EVENT start-post ] Emitting start-post: ", { postId: post._id });
+          postsService.emit("start-post", {
+            _id: post._id,
+            exposeTime: post.exposeTime,
+            media,
+          });
+        }
+      } else if (!this.shouldShow(post) && post.showing) {
+        console.log("[ EVENT end-post ] Emitting end-post: ", { postId: post._id });
+        await postsService.update(post._id, { ...post, showing: false });
+        postsService.emit("end-post", {
+          _id: post._id,
+        });
+      }
+    });
+  }
 
-		clearInterval(this.interval);
+  async stop() {
+    if (!this.status.running) return;
 
-		console.log("[ STOPPING CHECKING POSTS SHOWCASE ]");
-	}
+    this.status.running = false;
 
-	private shouldShow(post: Post) {
-		if (!post.startDate && !post.endDate) return this.calculateRecurrent(post);
+    clearInterval(this.interval);
 
-		return this.calculateNonRecurrent(post);
-	}
+    console.log("[ STOPPING CHECKING POSTS SHOWCASE ]");
+  }
 
-	private calculateRecurrent(post: Post): boolean {
-		const recurrence = post.recurrence!;
-		const isRecurrenceDay = Object.entries(recurrence)
-			.map(([unit, value]) => {
-				if (!value) return true;
-				if (
-					unit === "day" ||
-					unit === "isoweekday" ||
-					unit === "month" ||
-					unit === "year"
-				) {
-					return this.dateProvider.isTodaySameUnitValue(value, unit);
-				}
-				return false;
-			})
-			.every(isTodaySameUnitValueResult => isTodaySameUnitValueResult === true);
+  public shouldShow(
+    post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
+  ) {
+    if (!post.startDate && !post.endDate) return this.calculateRecurrent(post);
+    const shouldShow = this.calculateNonRecurrent(post);
+    return shouldShow;
+  }
 
-		if (!isRecurrenceDay) return false;
+  private calculateRecurrent(
+    post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
+  ): boolean {
+    const recurrence = post.recurrence!;
+    const isRecurrenceDay = Object.entries(recurrence)
+      .map(([unit, value]) => {
+        if (!value) return true;
+        if (
+          unit === "day" ||
+          unit === "isoweekday" ||
+          unit === "month" ||
+          unit === "year"
+        ) {
+          return this.dateProvider.isTodaySameUnitValue(value, unit);
+        }
+        return false;
+      })
+      .every((isTodaySameUnitValueResult) => isTodaySameUnitValueResult === true);
 
-		return this.checkTime(post);
-	}
+    if (!isRecurrenceDay) return false;
 
-	private calculateNonRecurrent(post: Post): boolean {
-		if (
-			this.dateProvider.isDateBeforeToday(post.endDate!) ||
-			this.dateProvider.isDateAfterToday(post.startDate!)
-		) {
-			return false;
-		}
+    return this.checkTime(post);
+  }
 
-		return this.checkTime(post);
-	}
+  private calculateNonRecurrent(
+    post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
+  ): boolean {
+    if (
+      this.dateProvider.isDateBeforeToday(post.endDate!) ||
+      this.dateProvider.isDateAfterToday(post.startDate!)
+    ) {
+      return false;
+    }
 
-	private checkTime(post: Post): boolean {
-		return this.dateProvider.isNowBetweenTimes(post.startTime, post.endTime);
-	}
+    return this.checkTime(post);
+  }
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async find(params?: Params): Promise<Data[] | Paginated<Data>> {
-		return [];
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async get(id: Id, params?: Params): Promise<Data> {
-		return this.status;
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async create(data: Data, params?: Params): Promise<Data> {
-		return data;
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async update(id: NullableId, data: Data, params?: Params): Promise<Data> {
-		return data;
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async patch(id: NullableId, data: Data, params?: Params): Promise<Data> {
-		return (this.status = data);
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async remove(id: NullableId, params?: Params): Promise<Data> {
-		return this.status;
-	}
+  private checkTime(
+    post: Pick<Post, "startDate" | "endDate" | "startTime" | "endTime" | "recurrence">
+  ): boolean {
+    return this.dateProvider.isNowBetweenTimes(post.startTime, post.endTime);
+  }
 }
