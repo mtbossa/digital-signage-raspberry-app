@@ -8,8 +8,8 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "build:raspberry": "turbo run build --filter=@intus/raspberry-\\*",
-    "build:docker": "turbo run build && docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7  -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging --push .",
+    "build:docker-staging": "turbo run build && docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7  -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging --push .",
+    "build:docker-local": "turbo run build && docker build -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging .",
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
     "lint": "turbo run lint",
