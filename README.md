@@ -79,4 +79,4 @@ Learn more about the power of Turborepo:
 Building Dockerfile for production:
 
 yarn build
-docker build -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging .
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7  -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging --push .
