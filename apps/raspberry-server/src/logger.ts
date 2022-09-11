@@ -1,11 +1,32 @@
-import { createLogger, format, transports } from "winston";
+import { createLogger, format, Logger, transports } from "winston";
 
-// Configure the Winston logger. For the complete documentation see https://github.com/winstonjs/winston
-const logger = createLogger({
-  // To see more detailed errors, change this to 'debug'
-  level: "info",
-  format: format.combine(format.splat(), format.simple()),
-  transports: [new transports.Console()],
-});
+const logsFolder = "./logs";
+let logger: Logger;
+
+if (process.env.NODE_ENV === "development") {
+  logger = createLogger({
+    level: "debug",
+    format: format.combine(format.splat(), format.simple()),
+    transports: [
+      new transports.Console(),
+      new transports.File({
+        filename: `${logsFolder}/errors.log`,
+        level: "error",
+      }),
+    ],
+  });
+} else {
+  logger = createLogger({
+    level: "info",
+    format: format.json(),
+    transports: [
+      new transports.Console(),
+      new transports.File({
+        filename: `${logsFolder}/errors.log`,
+        level: "error",
+      }),
+    ],
+  });
+}
 
 export default logger;

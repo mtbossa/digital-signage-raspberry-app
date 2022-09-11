@@ -4,6 +4,7 @@ import { HookContext } from "@feathersjs/feathers";
 
 import { ClientRequestError } from "./clients/intusAPI/intusAPI";
 import { Application } from "./declarations";
+import logger from "./logger";
 import { Post } from "./models/posts.model";
 
 export default function (app: Application): void {
@@ -15,7 +16,7 @@ export default function (app: Application): void {
 
   app.on("connection", async (connection: any): Promise<void> => {
     // On a new real-time connection, add it to the anonymous channel
-    console.log("[ FRONTEND CONNECTED ]");
+    logger.info("Frontend connected");
 
     app.channel("anonymous").join(connection);
 
