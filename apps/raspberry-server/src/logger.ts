@@ -3,13 +3,18 @@ import { createLogger, format, Logger, transports } from "winston";
 const logsFolder = "./logs";
 let logger: Logger;
 
+const myFormat = format.printf(({ level, message, timestamp }) => {
+  return `${timestamp} - ${level}: ${message}`;
+});
+
 if (process.env.NODE_ENV === "development") {
   logger = createLogger({
     level: "debug",
     format: format.combine(
       format.errors({ stack: true }),
-      format.splat(),
-      format.simple()
+      format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
+      format.colorize(),
+      myFormat
     ),
     transports: [
       new transports.Console({ handleExceptions: true }),
