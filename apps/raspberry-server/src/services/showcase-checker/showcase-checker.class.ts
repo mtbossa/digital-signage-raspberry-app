@@ -41,15 +41,48 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
 
     this.interval = setInterval(async () => {
       console.log("[ CHECKING POSTS SHOWCASE ]");
-      await this.checkPosts();
+      await this.checkAllPosts();
     }, this.checkTimeout);
 
     return this.status;
   }
 
-  public async checkPosts() {
+  private async emitStartPost(post: Post) {
     const postsService = this.app.service("posts");
     const mediasService = this.app.service("medias");
+
+    const media = await mediasService.get(post.mediaId);
+    if (media.downloaded) {
+      await postsService.update(post._id, { ...post, showing: true });
+      console.log("[ EVENT start-post ] Emitting start-post: ", { postId: post._id });
+      postsService.emit("start-post", {
+        _id: post._id,
+        exposeTime: post.exposeTime,
+        media,
+      });
+    }
+  }
+
+  private async emitEndPost(post: Post) {
+    const postsService = this.app.service("posts");
+
+    console.log("[ EVENT end-post ] Emitting end-post: ", { postId: post._id });
+    await postsService.update(post._id, { ...post, showing: false });
+    postsService.emit("end-post", {
+      _id: post._id,
+    });
+  }
+
+  public async checkPost(post: Post) {
+    if (this.shouldShow(post) && !post.showing) {
+      this.emitStartPost(post);
+    } else if (!this.shouldShow(post) && post.showing) {
+      this.emitEndPost(post);
+    }
+  }
+
+  public async checkAllPosts() {
+    const postsService = this.app.service("posts");
 
     const allPosts: Post[] = (await postsService.find({
       paginate: false,
@@ -57,22 +90,9 @@ export class ShowcaseChecker implements Pick<ServiceMethods<Data>, "create"> {
 
     allPosts.forEach(async (post) => {
       if (this.shouldShow(post) && !post.showing) {
-        const media = await mediasService.get(post.mediaId);
-        if (media.downloaded) {
-          await postsService.update(post._id, { ...post, showing: true });
-          console.log("[ EVENT start-post ] Emitting start-post: ", { postId: post._id });
-          postsService.emit("start-post", {
-            _id: post._id,
-            exposeTime: post.exposeTime,
-            media,
-          });
-        }
+        this.emitStartPost(post);
       } else if (!this.shouldShow(post) && post.showing) {
-        console.log("[ EVENT end-post ] Emitting end-post: ", { postId: post._id });
-        await postsService.update(post._id, { ...post, showing: false });
-        postsService.emit("end-post", {
-          _id: post._id,
-        });
+        this.emitEndPost(post);
       }
     });
   }

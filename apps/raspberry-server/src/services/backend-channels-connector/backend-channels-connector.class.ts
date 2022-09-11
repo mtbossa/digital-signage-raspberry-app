@@ -90,6 +90,7 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
   private async handlePostCreate(notification: PostCreatedNotification) {
     const mediasService: Medias = this.app.service("medias");
     const postsService: Posts = this.app.service("posts");
+    const showcaseChecker = this.app.service("showcase-checker");
 
     const postApi = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
     const mediaApi: Media = postApi.media;
@@ -104,9 +105,16 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
       }
     );
 
-    await postsService.create({
+    const newPost = await postsService.create({
       ...PostAdapter.fromAPIToLocal(postApi),
     });
+
+    // Even thought we know newPost is not an Array, typescript
+    // won't compile if we don't perform this check, since postsService.create()
+    // could return an array for some reason
+    if (!Array.isArray(newPost)) {
+      await showcaseChecker.checkPost(newPost);
+    }
   }
 
   private async handlePostDeleted(notification: PostDeletedNotification) {

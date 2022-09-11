@@ -37,7 +37,7 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
     } catch (e) {
       console.log("[ SYNC FINISH WITH ERROR ]");
       postsService.emit("sync-finish", { status: "finish" });
-      await showcaseChecker.checkPosts();
+      await showcaseChecker.checkAllPosts();
 
       throw e;
     }
@@ -74,7 +74,7 @@ export class PostsSync implements Pick<ServiceMethods<Data>, "create"> {
     );
 
     await this.removeUndeletedPosts(posts);
-    await showcaseChecker.checkPosts();
+    await showcaseChecker.checkAllPosts();
   }
 
   private async removeUndeletedPosts(notExpiredPosts: APIPost[]) {
