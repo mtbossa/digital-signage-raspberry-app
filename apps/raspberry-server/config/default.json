@@ -7,7 +7,7 @@
     "default": 10,
     "max": 50
   },
-  "serverCheckTimeout": 5000,
+  "serverCheckTimeout": 15000,
   "showcaseCheckTimeout": 5000,
   "dbName": "DB_NAME",
   "displayId": "DISPLAY_ID",
