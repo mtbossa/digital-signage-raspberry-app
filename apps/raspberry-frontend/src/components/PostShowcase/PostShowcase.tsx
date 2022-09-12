@@ -54,15 +54,18 @@ export default function PostShowcase({
 
   function handleNextPost() {
     if (deletablePosts.length > 0) {
-      const postsWithoutDeleted = latestPosts.filter((post) => {
+      const remainingPosts = latestPosts.filter((post) => {
         return deletablePosts.find(
           (deletedPost: Pick<Post, "_id">) => post._id !== deletedPost._id
         );
       });
-      updatePosts(postsWithoutDeleted);
-      if (postsWithoutDeleted.length === 0) {
+
+      updatePosts(remainingPosts);
+
+      if (remainingPosts.length === 0) {
         setShowingPost(null);
       }
+
       clearDeletablePosts();
     } else {
       if (latestPosts.length > 0) {
