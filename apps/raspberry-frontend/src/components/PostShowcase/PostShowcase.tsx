@@ -36,14 +36,15 @@ export default function PostShowcase({
 
     if (!showingPost) {
       setShowingPost({ ...getNextPost(showingPost) });
+      return;
+    }
+
+    if (showingPost?.media.type === "image") {
+      setTimeout(() => {
+        handleNextPost();
+      }, showingPost.exposeTime);
     } else {
-      if (showingPost?.media.type === "image") {
-        setTimeout(() => {
-          handleNextPost();
-        }, showingPost.exposeTime);
-      } else {
-        videoRef.current?.play();
-      }
+      videoRef.current?.play();
     }
   }, [showingPost, latestPosts]);
 
