@@ -54,11 +54,13 @@ export default function PostShowcase({
 
   function handleNextPost() {
     if (deletablePosts.length > 0) {
-      const remainingPosts = latestPosts.filter((post) => {
-        return deletablePosts.find(
-          (deletedPost: Pick<Post, "_id">) => post._id !== deletedPost._id
-        );
-      });
+      const uniqueDeletablePosts = Array.from(new Set(deletablePosts));
+      const remainingPosts = latestPosts.filter(
+        (post) =>
+          uniqueDeletablePosts.findIndex(
+            (deletedPost) => post._id === deletedPost._id
+          ) === -1
+      );
 
       updatePosts(remainingPosts);
 
