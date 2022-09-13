@@ -26,7 +26,6 @@ function App() {
 
   const setupWebSocket = useCallback(() => {
     postsService.on("sync-finish", (data: { status: "finish" | "failed" }) => {
-      console.log("sync-finish");
       setIsLoading(false);
     });
 
