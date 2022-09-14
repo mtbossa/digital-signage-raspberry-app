@@ -21,7 +21,7 @@ export default (options = {}): Hook => {
       await storage.delete(path.resolve(context.app.get("medias"), media.path));
       logger.debug(`Media file deleted successfully: ${media.filename}`);
     } catch (e) {
-      logger.warn("Error while deleting media file");
+      logger.warn(`Error while deleting media file: id ${media._id} - ${media.filename}`);
       logger.error(e);
     }
     return context;
