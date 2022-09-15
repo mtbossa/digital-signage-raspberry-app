@@ -42,11 +42,13 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     const authorizationToken: string = this.app.get("displayAPIToken");
     const apiUrl: string = this.app.get("apiUrl");
     const displayId: number = this.app.get("displayId");
+    const pusherAppCluster: string = this.app.get("pusherAppCluster");
+    const pusherAppKey: string = this.app.get("pusherAppKey");
 
     const options: Options = {
       authEndpoint: `${apiUrl}/api/broadcasting/auth`,
       forceTLS: true,
-      cluster: "sa1",
+      cluster: pusherAppCluster,
       enabledTransports: ["ws", "wss"],
       auth: {
         headers: {
@@ -55,12 +57,12 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
       },
     };
 
-    const pusher: Pusher = new Pusher("67f6f5d1618646d3ea95", options);
+    const pusher: Pusher = new Pusher(pusherAppKey, options);
 
     const laravelEcho: Echo = new Echo({
       ...options,
       broadcaster: "pusher",
-      key: "67f6f5d1618646d3ea95",
+      key: pusherAppKey,
       client: pusher,
       auth: {
         withCredentials: true,
