@@ -64,12 +64,6 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
       broadcaster: "pusher",
       key: pusherAppKey,
       client: pusher,
-      auth: {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${authorizationToken}`,
-        },
-      },
     });
 
     const channel: Channel = laravelEcho.private(`App.Models.Display.${displayId}`);
