@@ -79,4 +79,6 @@ Learn more about the power of Turborepo:
 Building Dockerfile for production:
 
 yarn build
-docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7  -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging --push .
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7  -f Dockerfile.production -t mtbossa/raspberry-prod:latest --push .
+
+When pushing to staging/develop, config values must always be correct, because they'll be used in the Raspberry.
