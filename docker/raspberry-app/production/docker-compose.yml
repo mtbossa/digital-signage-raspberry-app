@@ -3,7 +3,7 @@ version: "3"
 services:
 
   app:
-    image: mtbossa/raspberry-prod:staging
+    image: mtbossa/raspberry-prod:latest
     restart: always
     ports:
       - "45691:45691"
@@ -13,14 +13,3 @@ services:
       - ${MEDIAS_FOLDER_PATH}:/intus/public/medias
       - ${DB_FOLDER_PATH}:/intus/data
       - ${LOGS_FOLDER_PATH}:/intus/logs
-
-  watchtower:
-    image: containrrr/watchtower
-    environment:
-      REPO_USER: ${REPO_USER}
-      REPO_PASS: ${REPO_PASS}
-      WATCHTOWER_DEBUG: ${WATCHTOWER_DEBUG}
-      WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_SCHEDULE: "0 0 * * *"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock

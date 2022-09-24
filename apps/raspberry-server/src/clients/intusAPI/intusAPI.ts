@@ -81,7 +81,7 @@ export class IntusAPIResponseError extends InternalError {
 export class IntusAPI {
   readonly displayId = process.env["DISPLAY_ID"];
   readonly apiToken = process.env["DISPLAY_API_TOKEN"];
-  readonly apiUrl = process.env["API_URL"];
+  static apiUrl: string;
 
   constructor(
     protected request = new HTTPUtil.Request(),
@@ -91,7 +91,7 @@ export class IntusAPI {
   public async downloadMedia(filename: string, pathToSave: string): Promise<string> {
     try {
       const response = await this.request.get<Stream>(
-        `${this.apiUrl}/api/media/${filename}/download`,
+        `${IntusAPI.apiUrl}/api/media/${filename}/download`,
         {
           headers: { Authorization: `Bearer ${this.apiToken}` },
           responseType: "stream",
@@ -123,7 +123,7 @@ export class IntusAPI {
   public async fetchExpiredPosts(): Promise<PostExpired[]> {
     try {
       const response = await this.request.get<PostExpiredResponse>(
-        `${this.apiUrl}/api/displays/${this.displayId}/posts`,
+        `${IntusAPI.apiUrl}/api/displays/${this.displayId}/posts`,
         {
           headers: { Authorization: `Bearer ${this.apiToken}` },
           params: {
@@ -149,7 +149,7 @@ export class IntusAPI {
   public async fetchRaspberryPosts(): Promise<Post[]> {
     try {
       const response = await this.request.get<PostResponse>(
-        `${this.apiUrl}/api/displays/${this.displayId}/posts`,
+        `${IntusAPI.apiUrl}/api/displays/${this.displayId}/posts`,
         {
           headers: { Authorization: `Bearer ${this.apiToken}` },
         }
@@ -171,7 +171,7 @@ export class IntusAPI {
   public async checkServerStatus(): Promise<{ status: "up" }> {
     try {
       const response = await this.request.get<{ status: "up" }>(
-        `${this.apiUrl}/api/server-status`,
+        `${IntusAPI.apiUrl}/api/server-status`,
         {
           headers: { Authorization: `Bearer ${this.apiToken}` },
         }
