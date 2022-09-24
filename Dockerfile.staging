@@ -1,0 +1,19 @@
+FROM node:16
+
+ENV PORT=45691
+
+RUN apt-get update && \
+    apt-get install -yq tzdata && \
+    ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
+
+RUN mkdir -p /intus/app /intus/public/medias /intus/config /intus/data /intus/logs
+
+COPY apps/raspberry-server/build /intus/app
+COPY apps/raspberry-frontend/build /intus/public
+COPY apps/raspberry-server/config/default.json /intus/config/default.json
+COPY apps/raspberry-server/config/staging.json /intus/config/staging.json
+
+CMD ["node", "/intus/app/index.js"]
+
+EXPOSE $PORT

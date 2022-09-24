@@ -14,17 +14,6 @@ services:
       - ${DB_FOLDER_PATH}:/intus/data
       - ${LOGS_FOLDER_PATH}:/intus/logs
 
-  watchtower:
-    image: containrrr/watchtower
-    environment:
-      REPO_USER: ${REPO_USER}
-      REPO_PASS: ${REPO_PASS}
-      WATCHTOWER_DEBUG: ${WATCHTOWER_DEBUG}
-      WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_SCHEDULE: "0 0 * * *"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
 # For testing with local Laravel Sail backend
 # API_URL at .env must be the name of the Laravel Docker container e.g.: http://laravel:80
 # networks:

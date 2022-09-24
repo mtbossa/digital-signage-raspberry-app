@@ -13,6 +13,7 @@ import helmet from "helmet";
 
 import appHooks from "./app.hooks";
 import channels from "./channels";
+import { IntusAPI } from "./clients/intusAPI/intusAPI";
 import { Application } from "./declarations";
 import logger from "./logger";
 import middleware from "./middleware";
@@ -26,6 +27,9 @@ export type HookContext<T = any> = {
 
 // Load app configuration
 app.configure(configuration());
+
+IntusAPI.apiUrl = app.get("apiUrl");
+
 // Enable security, CORS, compression, favicon and body parsing
 app.use(
   helmet({
