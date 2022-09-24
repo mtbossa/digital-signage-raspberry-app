@@ -25,14 +25,14 @@ jobs:
       - name: Sets env vars for production
         run: |
           echo "DOCKER_IMAGE_NAME=mtbossa/raspberry-prod:latest" >> $GITHUB_ENV
-          echo "DOCKERFILE_NAME=Raspberry.production" >> $GITHUB_ENV
+          echo "DOCKERFILE_NAME=Dockerfile.production" >> $GITHUB_ENV
         if: github.ref_name == 'main'
 
       # This step is run when the branch is staging
       - name: Sets env vars for staging
         run: |
           echo "DOCKER_IMAGE_NAME=mtbossa/raspberry-prod:staging" >> $GITHUB_ENV
-          echo "DOCKERFILE_NAME=Raspberry.staging" >> $GITHUB_ENV
+          echo "DOCKERFILE_NAME=Dockerfile.staging" >> $GITHUB_ENV
         if: github.ref_name == 'staging'
 
       - name: Setup Node.js environment
