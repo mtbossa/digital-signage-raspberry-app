@@ -5,6 +5,7 @@
   "homepage": "",
   "private": true,
   "main": "src",
+  "bin": "build/index.js",
   "keywords": [
     "feathers"
   ],
@@ -30,8 +31,14 @@
     "start": "yarn run build && node build/",
     "jest": "jest --forceExit",
     "build": "shx rm -rf build/ && tsc",
-    "format": "prettier --write \"**/*.{ts,md}\"",
-    "postbuild": "cp package.json build && cp yarn.lock build && cd build && yarn remove @intus/eslint-config && yarn install --production"
+    "format": "prettier --write \"**/*.{ts,md}\""
+  },
+  "pkg": {
+    "assets": [
+      "config/**/*",
+      "public/**/*"
+    ],
+    "outputPath": "dist"
   },
   "standard": {
     "env": [

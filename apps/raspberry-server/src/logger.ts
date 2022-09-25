@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === "development") {
     exitOnError: false,
   });
 } else {
-  const logsFolder = "/intus/logs";
+  const logsFolder = `${process.cwd()}/logs`;
   logger = createLogger({
     level: "info",
     format: format.combine(format.errors({ stack: true }), format.json()),

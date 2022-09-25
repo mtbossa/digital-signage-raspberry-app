@@ -30,6 +30,12 @@ app.configure(configuration());
 
 IntusAPI.apiUrl = app.get("apiUrl");
 
+if (process.env.NODE_ENV === "production") {
+  const path = process.cwd();
+  app.set("nedb", `${path}/data`);
+  app.set("medias", `${path}/medias`);
+}
+
 // Enable security, CORS, compression, favicon and body parsing
 app.use(
   helmet({
