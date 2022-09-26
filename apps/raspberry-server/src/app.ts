@@ -31,9 +31,8 @@ app.configure(configuration());
 IntusAPI.apiUrl = app.get("apiUrl");
 
 if (process.env.NODE_ENV === "production") {
-  const currentPath = process.cwd();
-  app.set("nedb", path.join(currentPath, "/data"));
-  app.set("medias", path.join(currentPath, "/medias"));
+  app.set("nedb", "/usr/share/intus/data");
+  app.set("medias", "/usr/share/intus/medias");
 }
 
 // Enable security, CORS, compression, favicon and body parsing
