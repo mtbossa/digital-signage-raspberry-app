@@ -1,15 +1,18 @@
-## How it works
-@intus/raspberry-server is a FeathersJS WebSocket server, and @intus/raspberry-frontend is a React application, that will be served and communicate with the server.
+# How it works
+<p><i>@intus/raspberry-server</i> package is a FeathersJS WebSocket/HTTP server, and <i>@intus/raspberry-frontend</i> is a React application, which is served by the HTTP server, and communicats with it through the WebSocket server.</p>
 
-The build process first builds the server to a build folder, then the frontend, which will copy the built files to the public folder of the server package folder. Then, using vercel/pkg package, the server will be packaged to a binary, which then can run inside a raspberry.
+### Build process:
+>First the server is build to a build/ folder, then the frontend as well, which will copy the built files to the public folder of the server folder. Then, using [`vercel/pkg`](https://github.com/vercel/pkg), the server will be packaged to a binary containing the built frontend and the configuration files used by the server.
+
+## **Atention**
 
 When building for staging and production, must be sure that all the values inside the config folder are correct, because they'll be used by the packaged application.
 
-## Running the app on Raspberry
-When production:
-`NODE_ENV=production DISPLAY_ID=1 DISPLAY_API_TOKEN="1|nBFdATiw1jQQuKpeXQ48uwyaant4dt6nxmjEAdK9" ./raspberry-server-arm64`
-When staging:
-`NODE_ENV=staging DISPLAY_ID=1 DISPLAY_API_TOKEN="1|nBFdATiw1jQQuKpeXQ48uwyaant4dt6nxmjEAdK9" ./raspberry-server-arm64`
-When development:
-`NODE_ENV=development DISPLAY_ID=1 DISPLAY_API_TOKEN="1|nBFdATiw1jQQuKpeXQ48uwyaant4dt6nxmjEAdK9" ./raspberry-server-arm64`
+# Running the app on Raspberry
+* Production: <br>
+`NODE_ENV=production DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server-arm64`
+* Staging: <br>
+`NODE_ENV=staging DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server-arm64`
+* Development: <br>
+`NODE_ENV=development DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server-arm64`
 
