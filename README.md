@@ -76,7 +76,5 @@ Learn more about the power of Turborepo:
 - [Configuration Options](https://turborepo.org/docs/reference/configuration)
 - [CLI Usage](https://turborepo.org/docs/reference/command-line-reference)
 
-Building Dockerfile for production:
-
-yarn build
-docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7  -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging --push .
+## Running the app on Raspberry
+NODE_ENV=production DISPLAY_ID=1 DISPLAY_API_TOKEN="1|nBFdATiw1jQQuKpeXQ48uwyaant4dt6nxmjEAdK9" ./raspberry-server-arm64

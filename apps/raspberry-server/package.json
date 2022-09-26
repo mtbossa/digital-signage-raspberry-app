@@ -31,14 +31,19 @@
     "start": "yarn run build && node build/",
     "jest": "jest --forceExit",
     "build": "shx rm -rf build/ && tsc",
-    "format": "prettier --write \"**/*.{ts,md}\""
+    "format": "prettier --write \"**/*.{ts,md}\"",
+    "package": "npx pkg package.json"
   },
   "pkg": {
     "assets": [
       "config/**/*",
       "public/**/*"
     ],
-    "outputPath": "dist"
+    "outputPath": "dist",
+    "targets": [
+      "node16-linux-arm64",
+      "node16-linux-x64"
+    ]
   },
   "standard": {
     "env": [

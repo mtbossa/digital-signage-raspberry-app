@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "postbuild": "cd apps/raspberry-server && yarn package",
     "build:raspberry": "turbo run build --filter=@intus/raspberry-\\*",
     "build:docker-staging": "turbo run build && docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7  -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging --push .",
     "build:docker-prod": "turbo run build && docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7  -f Dockerfile.raspberry -t mtbossa/raspberry-prod:production --push .",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "husky": "^8.0.1",
+    "pkg": "^5.8.0",
     "prettier": "latest",
     "turbo": "latest"
   },

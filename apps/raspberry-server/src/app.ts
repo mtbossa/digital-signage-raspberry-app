@@ -31,9 +31,9 @@ app.configure(configuration());
 IntusAPI.apiUrl = app.get("apiUrl");
 
 if (process.env.NODE_ENV === "production") {
-  const path = process.cwd();
-  app.set("nedb", `${path}/data`);
-  app.set("medias", `${path}/medias`);
+  const currentPath = process.cwd();
+  app.set("nedb", path.join(currentPath, "/data"));
+  app.set("medias", path.join(currentPath, "/medias"));
 }
 
 // Enable security, CORS, compression, favicon and body parsing
@@ -46,9 +46,9 @@ app.use(cors());
 app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// Host the public folder
-app.use(express.static(app.get("medias")));
+
 app.use(express.static(app.get("public")));
+app.use("/medias", express.static(path.join(app.get("medias"))));
 
 // Set up Plugins and providers
 app.configure(express.rest());
