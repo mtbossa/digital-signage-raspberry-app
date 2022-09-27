@@ -67,19 +67,4 @@ app.use(express.errorHandler({ logger } as any));
 
 app.hooks(appHooks);
 
-(async () => {
-  const chromePath = "/usr/bin/chromium-browser";
-  const browser = await puppeteer.launch({
-    executablePath: chromePath,
-    args: [
-      "--no-sandbox",
-      "--incognito",
-      "--start-fullscreen",
-      "--disable-crash-reporter",
-    ],
-  });
-  const page = await browser.newPage();
-  await page.goto(`http://localhost:${app.get("port")}`);
-})();
-
 export default app;
