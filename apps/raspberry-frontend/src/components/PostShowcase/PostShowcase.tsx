@@ -32,7 +32,7 @@ export default function PostShowcase({
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    if (latestPosts.length === 0) return;
+    if (latestPosts.length === 0 && !showingPost) return;
 
     if (!showingPost) {
       setShowingPost({ ...getNextPost(showingPost) });
@@ -62,13 +62,13 @@ export default function PostShowcase({
           ) === -1
       );
 
-      updatePosts(remainingPosts);
-
       if (remainingPosts.length === 0) {
         setShowingPost(null);
+      } else {
+        setShowingPost({ ...getNextPost(showingPost) });
       }
-
       clearDeletablePosts();
+      updatePosts(remainingPosts);
     } else {
       if (latestPosts.length > 0) {
         setShowingPost({ ...getNextPost(showingPost) });
