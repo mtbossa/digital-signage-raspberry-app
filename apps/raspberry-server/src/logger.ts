@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === "development") {
   });
 } else {
   const userHomeDir = os.homedir();
-  const logsFolder = path.join(userHomeDir, ".local/", "share/", "intus/");
+  const logsFolder = path.join(userHomeDir, ".local/", "share/", "intus/logs");
   logger = createLogger({
     level: "info",
     format: format.combine(format.errors({ stack: true }), format.json()),
