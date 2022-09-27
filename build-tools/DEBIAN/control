@@ -1,7 +1,0 @@
-Package: intus-raspberry
-Version: 0.0.1
-Maintainer: Mateus Ribeiro Bossa <mateus.rbossa@gmail.com>
-Depends: chromium-browser, unclutter
-Architecture: arm64
-Homepage: 
-Description: Kiosk App for Intus
