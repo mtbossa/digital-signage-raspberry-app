@@ -10,7 +10,7 @@ import socketio from "@feathersjs/socketio";
 import compress from "compression";
 import cors from "cors";
 import helmet from "helmet";
-import puppeteer from "puppeteer-core";
+import os from "os";
 
 import appHooks from "./app.hooks";
 import channels from "./channels";
@@ -30,10 +30,11 @@ export type HookContext<T = any> = {
 app.configure(configuration());
 
 IntusAPI.apiUrl = app.get("apiUrl");
-
-if (process.env.NODE_ENV === "production") {
-  app.set("nedb", "/usr/share/intus/data");
-  app.set("medias", "/usr/share/intus/medias");
+if (process.env.NODE_ENV !== "development") {
+  const userHomeDir = os.homedir();
+  const storagePath = path.join(userHomeDir, ".local/", "share/", "intus/");
+  app.set("nedb", `${storagePath}/data`);
+  app.set("medias", `${storagePath}/medias`);
 }
 
 // Enable security, CORS, compression, favicon and body parsing

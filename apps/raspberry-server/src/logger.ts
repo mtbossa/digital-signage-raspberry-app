@@ -1,3 +1,5 @@
+import os from "os";
+import path from "path";
 import { createLogger, format, Logger, transports } from "winston";
 
 let logger: Logger;
@@ -30,7 +32,8 @@ if (process.env.NODE_ENV === "development") {
     exitOnError: false,
   });
 } else {
-  const logsFolder = `/usr/share/intus/logs`;
+  const userHomeDir = os.homedir();
+  const logsFolder = path.join(userHomeDir, ".local/", "share/", "intus/");
   logger = createLogger({
     level: "info",
     format: format.combine(format.errors({ stack: true }), format.json()),
