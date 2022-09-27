@@ -8,13 +8,15 @@
 
 When building for staging and production, must be sure that all the values inside the config folder are correct, because they'll be used by the packaged application.
 
-After build, must push the new build package to the intus-kiosk-app repository in the correct branch. Eg.: If build for staging, push to staging branch.
+After build, must push the new build package to the [intus-kiosk-app repository](https://github.com/intuskioskapp/intuskioskapp.git) with key in the correct branch. Eg.: If build for staging, push to staging branch.
+
+Then, must clone from specif branch 
 
 # Running the app on Raspberry
 * Production: <br>
-`NODE_ENV=production DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server-arm64`
+`NODE_ENV=production DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server`
 * Staging: <br>
-`NODE_ENV=staging DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server-arm64`
+`NODE_ENV=staging DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server`
 * Development: <br>
-`NODE_ENV=development DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server-arm64`
+`NODE_ENV=development DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server`
 
