@@ -4,13 +4,18 @@
 ### Build process:
 >First the server is build to a build/ folder, then the frontend as well, which will copy the built files to the public folder of the server folder. Then, using [`vercel/pkg`](https://github.com/vercel/pkg), the server will be packaged to a binary containing the built frontend and the configuration files used by the server.
 
+**MUST**: in order for the build to work, must follow the steps from the [`vercel/pkg`](https://github.com/vercel/pkg) docs, where it says:
+>To be able to generate executables for all supported architectures and platforms, run pkg on a Linux host with binfmt (QEMU emulation) configured and ldid installed.
+
+So, we can install it using [tonistiigi/binfmt](https://github.com/tonistiigi/binfmt) `arm64` platform and then build.
+
 ## **Atention**
 
 When building for staging and production, must be sure that all the values inside the config folder are correct, because they'll be used by the packaged application.
 
 After build, must push the new build package to the [intus-kiosk-app repository](https://github.com/intuskioskapp/intuskioskapp.git) with key in the correct branch. Eg.: If build for staging, push to staging branch.
 
-Then, must clone from specif branch 
+Then, must clone from specif branch.
 
 # Running the app on Raspberry
 * Production: <br>
