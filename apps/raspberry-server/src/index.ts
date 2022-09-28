@@ -24,7 +24,13 @@ if (process.env.NODE_ENV !== "development") {
       headless: false,
       executablePath: "/usr/bin/chromium-browser",
       args: ["--kiosk", "--ingonito"],
-      ignoreDefaultArgs: ["--enable-automation"],
+      ignoreDefaultArgs: [
+        "--enable-automation",
+        "--disable-extensions",
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+      ],
+      timeout: 0,
       defaultViewport: null,
     });
     const page = (await browser.pages())[0];
