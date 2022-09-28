@@ -1,3 +1,5 @@
+import puppeteer from "puppeteer-core";
+
 import app from "./app";
 import logger from "./logger";
 
@@ -15,3 +17,17 @@ process.on("unhandledRejection", (reason, p) => {
 server.on("listening", async () => {
   logger.info(`Feathers application started on http://${app.get("host")}:${port}`);
 });
+
+if (process.env.NODE_ENV !== "development") {
+  (async () => {
+    const browser = await puppeteer.launch({
+      headless: false,
+      executablePath: "/usr/bin/chromium-browser",
+      args: ["--kiosk", "--ingonito"],
+      ignoreDefaultArgs: ["--enable-automation"],
+      defaultViewport: null,
+    });
+    const page = (await browser.pages())[0];
+    await page.goto("http://localhost:45691");
+  })();
+}
