@@ -24,12 +24,7 @@ if (process.env.NODE_ENV !== "development") {
       headless: false,
       executablePath: "/usr/bin/chromium-browser",
       args: ["--kiosk", "--ingonito"],
-      ignoreDefaultArgs: [
-        "--enable-automation",
-        "--disable-extensions",
-        "--disable-setuid-sandbox",
-        "--no-sandbox",
-      ],
+      ignoreDefaultArgs: ["--enable-automation", "--disable-extensions"],
       timeout: 0,
       defaultViewport: null,
     });
