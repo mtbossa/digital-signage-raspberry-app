@@ -1,7 +1,10 @@
 import type { Component } from 'solid-js';
+import client from "./feathers";
 
-import logo from './logo.svg';
-import styles from './App.module.css';
+import logo from "./logo.svg";
+import styles from "./App.module.css";
+
+const postsService = client.service("posts");
 
 const App: Component = () => {
   return (

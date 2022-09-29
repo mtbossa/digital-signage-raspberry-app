@@ -16,6 +16,11 @@
     "vite-plugin-solid": "^2.3.0"
   },
   "dependencies": {
+    "@feathersjs/client": "^4.5.11",
+    "@feathersjs/feathers": "^4.5.11",
+    "@feathersjs/socketio-client": "^4.5.11",
+    "@intus/raspberry-server": "*",
+    "socket.io-client": "^2.4.0",
     "solid-js": "^1.5.1"
   }
 }
