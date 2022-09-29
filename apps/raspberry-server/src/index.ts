@@ -19,16 +19,21 @@ server.on("listening", async () => {
 });
 
 if (process.env.NODE_ENV !== "development") {
-  (async () => {
-    const browser = await puppeteer.launch({
-      headless: false,
-      executablePath: "/usr/bin/chromium-browser",
-      args: ["--kiosk", "--ingonito"],
-      ignoreDefaultArgs: ["--enable-automation", "--disable-extensions"],
-      timeout: 0,
-      defaultViewport: null,
-    });
-    const page = (await browser.pages())[0];
-    await page.goto("http://localhost:45691");
-  })();
+  const interval = setInterval(async () => {
+    try {
+      const browser = await puppeteer.launch({
+        headless: false,
+        executablePath: "/usr/bin/chromium-browser",
+        args: ["--kiosk", "--ingonito"],
+        ignoreDefaultArgs: ["--enable-automation", "--disable-extensions"],
+        timeout: 30000,
+        defaultViewport: null,
+      });
+      const page = (await browser.pages())[0];
+      await page.goto("http://localhost:45691");
+      clearInterval(interval);
+    } catch {
+      logger.error("Unable to launch browser, trying again...");
+    }
+  }, 40000);
 }
