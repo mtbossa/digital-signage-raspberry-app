@@ -21,7 +21,7 @@
     "husky": "^8.0.1",
     "pkg": "^5.8.0",
     "prettier": "latest",
-    "turbo": "latest"
+    "turbo": "^1.5.4"
   },
   "engines": {
     "npm": ">=7.0.0",
