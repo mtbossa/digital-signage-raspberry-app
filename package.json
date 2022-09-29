@@ -11,6 +11,7 @@
     "postbuild": "cd apps/raspberry-server && yarn package",
     "build:raspberry": "turbo run build --filter=@intus/raspberry-\\*",
     "dev": "turbo run dev --parallel",
+    "dev:new": "turbo run dev --parallel --filter=@intus/raspberry-server --filter=@intus/raspberry-frontend-solidjs",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "turbo run format",
