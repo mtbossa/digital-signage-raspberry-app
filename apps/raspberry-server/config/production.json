@@ -1,5 +1,8 @@
 {
   "serverCheckTimeout": 60000,
   "showcaseCheckTimeout": 10000,
-  "port": 45691
+  "port": 45691,
+  "apiUrl": "http://192.168.0.108",
+  "pusherAppCluster": "sa1",
+  "pusherAppKey": "67f6f5d1618646d3ea95"
 }

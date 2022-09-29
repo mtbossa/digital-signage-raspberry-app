@@ -1,0 +1,9 @@
+[ process.cwd() ] /home/mtbossa/development/intus/intus-raspberry/apps/raspberry-server
+[32minfo[39m: Feathers application started on http://localhost:45691
+[32minfo[39m: Frontend connected
+[32minfo[39m: Starting to sync posts
+[32minfo[39m: Posts syncing finish with success
+[32minfo[39m: Connecting to Laravel WebSocket channels
+[32minfo[39m: Starting showcase checker
+[32minfo[39m: Starting Server Status Checker
+[32minfo[39m: Emitting start-post: postId: 51

@@ -10,6 +10,7 @@ import socketio from "@feathersjs/socketio";
 import compress from "compression";
 import cors from "cors";
 import helmet from "helmet";
+import os from "os";
 
 import appHooks from "./app.hooks";
 import channels from "./channels";
@@ -29,6 +30,12 @@ export type HookContext<T = any> = {
 app.configure(configuration());
 
 IntusAPI.apiUrl = app.get("apiUrl");
+if (process.env.NODE_ENV !== "development") {
+  const userHomeDir = os.homedir();
+  const storagePath = path.join(userHomeDir, ".local/", "share/", "intus/");
+  app.set("nedb", `${storagePath}/data`);
+  app.set("medias", `${storagePath}/medias`);
+}
 
 // Enable security, CORS, compression, favicon and body parsing
 app.use(
@@ -40,9 +47,9 @@ app.use(cors());
 app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// Host the public folder
-app.use(express.static(app.get("medias")));
+
 app.use(express.static(app.get("public")));
+app.use("/medias", express.static(path.join(app.get("medias"))));
 
 // Set up Plugins and providers
 app.configure(express.rest());

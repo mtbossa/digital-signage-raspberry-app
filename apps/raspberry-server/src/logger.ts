@@ -1,3 +1,5 @@
+import os from "os";
+import path from "path";
 import { createLogger, format, Logger, transports } from "winston";
 
 let logger: Logger;
@@ -30,7 +32,8 @@ if (process.env.NODE_ENV === "development") {
     exitOnError: false,
   });
 } else {
-  const logsFolder = "/intus/logs";
+  const userHomeDir = os.homedir();
+  const logsFolder = path.join(userHomeDir, ".local/", "share/", "intus/logs");
   logger = createLogger({
     level: "info",
     format: format.combine(format.errors({ stack: true }), format.json()),
@@ -42,10 +45,22 @@ if (process.env.NODE_ENV === "development") {
       new transports.File({
         filename: `${logsFolder}/errors.log`,
         level: "error",
+        format: format.combine(
+          format.errors({ stack: true }),
+          format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
+          format.json()
+        ),
       }),
     ],
     exceptionHandlers: [
-      new transports.File({ filename: `${logsFolder}/exceptions.log` }),
+      new transports.File({
+        filename: `${logsFolder}/exceptions.log`,
+        format: format.combine(
+          format.errors({ stack: true }),
+          format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
+          format.json()
+        ),
+      }),
     ],
     exitOnError: false,
   });
