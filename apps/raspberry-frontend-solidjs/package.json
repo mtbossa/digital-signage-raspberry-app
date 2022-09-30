@@ -7,6 +7,7 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "rm -rf ../raspberry-server/public && mv ./dist ../raspberry-server/public",
     "serve": "vite preview"
   },
   "license": "MIT",
