@@ -26,14 +26,29 @@ if (process.env.NODE_ENV !== "development") {
         executablePath: "/usr/bin/chromium-browser",
         args: ["--kiosk", "--ingonito"],
         ignoreDefaultArgs: ["--enable-automation", "--disable-extensions"],
-        timeout: 30000,
+        timeout: 10000,
         defaultViewport: null,
       });
-      const page = (await browser.pages())[0];
-      await page.goto("http://localhost:45691");
+
       clearInterval(interval);
+
+      const page = (await browser.pages())[0];
+      page.reload();
+      await page.goto("http://localhost:45691");
+
+      page.on("error", async (err) => {
+        logger.error("error happen at the page: ", err);
+        page.reload();
+        await page.goto("http://localhost:45691");
+      });
+
+      page.on("pageerror", async (pageerr) => {
+        logger.error("pageerror occurred: ", pageerr);
+        page.reload();
+        await page.goto("http://localhost:45691");
+      });
     } catch {
       logger.error("Unable to launch browser, trying again...");
     }
-  }, 40000);
+  }, 15000);
 }
