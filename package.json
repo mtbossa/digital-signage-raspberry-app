@@ -7,10 +7,12 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "postbuild": "cd apps/raspberry-server && yarn package",
-    "build:raspberry": "turbo run build --filter=@intus/raspberry-\\*",
-    "dev": "turbo run dev --parallel",
+    "build:react": "turbo run build --filter=@intus/raspberry-server --filter=@intus/raspberry-frontend",
+    "postbuild:react": "cd apps/raspberry-server && yarn package",
+    "build:solid": "turbo run build --filter=@intus/raspberry-server --filter=@intus/raspberry-frontend-solidjs",
+    "postbuild:solid": "cd apps/raspberry-server && yarn package",
+    "dev:react": "turbo run dev --parallel --filter=@intus/raspberry-server --filter=@intus/raspberry-frontend",
+    "dev:solid": "turbo run dev --parallel --filter=@intus/raspberry-server --filter=@intus/raspberry-frontend-solidjs",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "turbo run format",
@@ -20,7 +22,7 @@
     "husky": "^8.0.1",
     "pkg": "^5.8.0",
     "prettier": "latest",
-    "turbo": "latest"
+    "turbo": "^1.5.4"
   },
   "engines": {
     "npm": ">=7.0.0",
