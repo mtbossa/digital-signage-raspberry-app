@@ -19,7 +19,7 @@ server.on("listening", async () => {
   logger.info(`Feathers application started on http://${app.get("host")}:${port}`);
 });
 
-if (process.env.NODE_ENV !== "development") {
+if (!process.env.DONT_OPEN_BROWSER) {
   (async () => {
     const browserController = await startApp();
     app.set("browserController", browserController);

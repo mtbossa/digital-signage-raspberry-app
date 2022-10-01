@@ -39,6 +39,8 @@ class BrowserController {
   }
 
   public async launchBrowser(): Promise<Browser> {
+    // When on Windows, must set the chrome.exe path to the PATH env variable
+    const chromePath = process.env.CHROME_PATH ?? "/usr/bin/chromium-browser";
     return new Promise((resolve) => {
       let browser: Browser | null = null;
 
@@ -51,13 +53,13 @@ class BrowserController {
 
           browser = await puppeteer.launch({
             headless: false,
-            executablePath: "/usr/bin/chromium-browser",
+            executablePath: chromePath,
             args: ["--kiosk", "--ingonito"],
             ignoreDefaultArgs: ["--enable-automation", "--disable-extensions"],
             timeout: 10000,
             defaultViewport: null,
           });
-        } catch {
+        } catch (e) {
           logger.error("Unable to launch browser, trying again...");
         }
       }, 15000);
