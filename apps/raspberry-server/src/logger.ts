@@ -39,7 +39,11 @@ if (process.env.NODE_ENV === "development") {
     format: format.combine(format.errors({ stack: true }), format.json()),
     transports: [
       new transports.Console({
-        format: format.combine(format.colorize(), format.simple()),
+        format: format.combine(
+          format.colorize(),
+          format.simple(),
+          format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" })
+        ),
         handleExceptions: true,
       }),
       new transports.File({
