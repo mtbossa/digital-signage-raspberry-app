@@ -1,6 +1,7 @@
 import os from "os";
 import path from "path";
 import { createLogger, format, Logger, transports } from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
 
 type AppEnv = "development" | "staging" | "production";
 const APP_ENV: AppEnv = process.env.NODE_ENV as AppEnv;
@@ -40,6 +41,19 @@ if (APP_ENV === "development") {
   const logsFolder = path.join(userHomeDir, ".local/", "share/", "intus/logs");
 
   if (APP_ENV === "staging") {
+    const dailyTransport: DailyRotateFile = new DailyRotateFile({
+      filename: `${logsFolder}/errors-%DATE%.log`,
+      datePattern: "HH",
+      maxSize: "100m",
+      level: "error",
+      format: format.combine(
+        format.errors({ stack: true }),
+        format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
+        format.json()
+      ),
+      handleExceptions: true,
+    });
+
     logger = createLogger({
       level: "info",
       format: format.combine(format.errors({ stack: true }), format.json()),
@@ -52,27 +66,8 @@ if (APP_ENV === "development") {
           ),
           handleExceptions: true,
         }),
-        new transports.File({
-          filename: `${logsFolder}/errors.log`,
-          level: "error",
-          format: format.combine(
-            format.errors({ stack: true }),
-            format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
-            format.json()
-          ),
-        }),
+        dailyTransport,
       ],
-      exceptionHandlers: [
-        new transports.File({
-          filename: `${logsFolder}/exceptions.log`,
-          format: format.combine(
-            format.errors({ stack: true }),
-            format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
-            format.json()
-          ),
-        }),
-      ],
-      exitOnError: false,
     });
   } else {
     logger = createLogger({

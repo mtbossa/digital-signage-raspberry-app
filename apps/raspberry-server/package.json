@@ -69,7 +69,8 @@
     "puppeteer-core": "^18.0.5",
     "pusher-js": "^7.1.1-beta",
     "serve-favicon": "^2.5.0",
-    "winston": "^3.0.0"
+    "winston": "^3.0.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "@intus/eslint-config": "*",
