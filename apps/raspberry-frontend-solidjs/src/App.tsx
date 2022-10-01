@@ -30,6 +30,10 @@ const findPlayingPostIndex = (playingPostId: number, currentPosts: Post[]) => {
   return currentPosts.findIndex((post) => post._id === playingPostId);
 };
 
+const isPostAlreadyInCarousel = (newPost: Post, carousel: Post[]) => {
+  return carousel.find((post) => post._id === newPost._id);
+};
+
 const App: Component = () => {
   const [loading, setLoading] = createSignal(true);
   const [newPosts, setNewPosts] = createSignal<Post[]>([]);
@@ -45,16 +49,18 @@ const App: Component = () => {
       setLoading(false);
     });
 
-    postsService.on("start-post", (post: Post) => {
+    postsService.on("start-post", (newPost: Post) => {
+      if (isPostAlreadyInCarousel(newPost, carousel())) return;
+
       setNewPosts((newPosts) => {
         const newPostIndex = newPosts.findIndex(
-          (currentPost) => currentPost._id === post._id
+          (currentPost) => currentPost._id === newPost._id
         );
 
         const postNotHere = newPostIndex === -1;
 
         if (postNotHere) {
-          return [...newPosts!, post];
+          return [...newPosts!, newPost];
         }
 
         return newPosts;
