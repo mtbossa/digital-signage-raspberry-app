@@ -37,7 +37,7 @@ const App: Component = () => {
   const [playingPost, setPlayingPost] = createSignal<Post | null>(null, {
     equals: false,
   });
-  const [carrousel, setCarrousel] = createSignal<Post[]>([]);
+  const [carousel, setCarousel] = createSignal<Post[]>([]);
   let videoRef: HTMLVideoElement;
 
   onMount(() => {
@@ -69,10 +69,10 @@ const App: Component = () => {
   });
 
   createEffect(() => {
-    const carrouselIsEmpty = carrousel().length === 0;
-    if (hasNewPosts() && carrouselIsEmpty) {
-      setCarrousel(newPosts());
-      setPlayingPost(carrousel()[0]);
+    const carouselIsEmpty = carousel().length === 0;
+    if (hasNewPosts() && carouselIsEmpty) {
+      setCarousel(newPosts());
+      setPlayingPost(carousel()[0]);
       setNewPosts([]);
     }
   });
@@ -86,23 +86,23 @@ const App: Component = () => {
   });
 
   function handleNextPost() {
-    let updatedCarrousel: Post[] = carrousel();
+    let updatedCarousel: Post[] = carousel();
 
     if (hasNewPosts()) {
-      updatedCarrousel = addNewPostsToCarrousel();
+      updatedCarousel = addNewPostsToCarousel();
       setNewPosts([]);
     }
 
     if (hasPostsToDeleted()) {
-      updatedCarrousel = removeDeletedPostsFromCarrousel(updatedCarrousel);
+      updatedCarousel = removeDeletedPostsFromCarousel(updatedCarousel);
       setDeletedPosts([]);
     }
 
-    const playingPostIndex = findPlayingPostIndex(playingPost()!._id, carrousel());
-    setCarrousel(updatedCarrousel);
-    const nextPost = carrousel()[playingPostIndex + 1];
-    // nextPost will be null when the playingPost is the last inside de carrousel()
-    setPlayingPost(nextPost ?? carrousel()[0]);
+    const playingPostIndex = findPlayingPostIndex(playingPost()!._id, carousel());
+    setCarousel(updatedCarousel);
+    const nextPost = carousel()[playingPostIndex + 1];
+    // nextPost will be null when the playingPost is the last inside de carousel()
+    setPlayingPost(nextPost ?? carousel()[0]);
   }
 
   function hasNewPosts() {
@@ -113,12 +113,12 @@ const App: Component = () => {
     return deletedPosts().length > 0;
   }
 
-  function addNewPostsToCarrousel() {
-    return [...carrousel(), ...newPosts()];
+  function addNewPostsToCarousel() {
+    return [...carousel(), ...newPosts()];
   }
 
-  function removeDeletedPostsFromCarrousel(currentUpdatedCarrousel: Post[]) {
-    const remainingPosts = currentUpdatedCarrousel.filter(
+  function removeDeletedPostsFromCarousel(currentUpdatedCarousel: Post[]) {
+    const remainingPosts = currentUpdatedCarousel.filter(
       (post) => !deletedPosts().find((deletedPost) => deletedPost._id === post._id)
     );
     return remainingPosts;
@@ -127,7 +127,7 @@ const App: Component = () => {
   return (
     <>
       <Show when={!loading()} fallback={<Loading />}>
-        <Show when={carrousel().length > 0} fallback={<NoPost />}>
+        <Show when={carousel().length > 0} fallback={<NoPost />}>
           <Switch fallback={<NoPost />}>
             <Match when={playingPost()?.media.type === "image"}>
               <img
