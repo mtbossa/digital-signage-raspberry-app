@@ -46,18 +46,18 @@ const App: Component = () => {
     });
 
     postsService.on("start-post", (post: Post) => {
-      setNewPosts((newPost) => {
-        const newPostIndex = newPost.findIndex(
+      setNewPosts((newPosts) => {
+        const newPostIndex = newPosts.findIndex(
           (currentPost) => currentPost._id === post._id
         );
 
         const postNotHere = newPostIndex === -1;
 
         if (postNotHere) {
-          return [...newPost!, post];
+          return [...newPosts!, post];
         }
 
-        return newPost;
+        return newPosts;
       });
     });
 
