@@ -38,7 +38,7 @@ class BrowserController {
     });
   }
 
-  public async launchBrowser(): Promise<Browser> {
+  public launchBrowser(): Promise<Browser> {
     // When on Windows, must set the chrome.exe path to the PATH env variable
     const chromePath = process.env.CHROME_PATH ?? "/usr/bin/chromium-browser";
     return new Promise((resolve) => {
@@ -59,6 +59,9 @@ class BrowserController {
             timeout: 10000,
             defaultViewport: null,
           });
+          clearInterval(interval);
+          resolve(browser);
+          return;
         } catch (e) {
           logger.error("Unable to launch browser, trying again...");
         }
