@@ -2,7 +2,7 @@ import puppeteer from "puppeteer-core";
 
 import app from "./app";
 import logger from "./logger";
-import startApp from "./utils/browser";
+import startApp from "./utils/BrowserController";
 
 const port = app.get("port");
 const server = app.listen(port);
