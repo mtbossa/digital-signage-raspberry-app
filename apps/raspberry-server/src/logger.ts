@@ -13,7 +13,7 @@ const myFormat = format.printf(({ level, message, timestamp }) => {
 });
 
 if (APP_ENV === "development") {
-  const logsFolder = "./logs";
+  const logsFolder = `${process.cwd()}/logs`;
 
   logger = createLogger({
     level: "debug",

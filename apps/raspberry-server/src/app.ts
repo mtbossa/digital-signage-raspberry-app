@@ -30,7 +30,12 @@ export type HookContext<T = any> = {
 app.configure(configuration());
 
 IntusAPI.apiUrl = app.get("apiUrl");
-if (process.env.NODE_ENV !== "development") {
+if (process.env.NODE_ENV === "development") {
+  const storagePath = process.cwd();
+  console.log("STORAGE PATH: ", storagePath);
+  app.set("nedb", `${storagePath}/data`);
+  app.set("medias", `${storagePath}/medias`);
+} else {
   const userHomeDir = os.homedir();
   const storagePath = path.join(userHomeDir, ".local/", "share/", "intus/");
   app.set("nedb", `${storagePath}/data`);
