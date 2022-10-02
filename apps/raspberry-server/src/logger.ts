@@ -27,6 +27,10 @@ if (APP_ENV === "development") {
     transports: [
       new transports.Console({ handleExceptions: true }),
       new transports.File({
+        filename: `${logsFolder}/debug.log`,
+        level: "debug",
+      }),
+      new transports.File({
         filename: `${logsFolder}/errors.log`,
         level: "error",
       }),
