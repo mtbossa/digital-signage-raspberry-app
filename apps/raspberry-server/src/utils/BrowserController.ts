@@ -5,6 +5,9 @@ import logger from "../logger";
 class BrowserController {
   browser: Browser | null = null;
   appPage: Page | null = null;
+  // Since we don't have access to app, we must hardcode the port based on NODE_ENV
+  // which must be the same on config files
+  appPort: number = process.env.NODE_ENV === "development" ? 3030 : 45691;
 
   public async startApp() {
     if (this.browser) {
@@ -27,7 +30,13 @@ class BrowserController {
     }
 
     this.appPage = await this.browser.newPage();
-    this.appPage.goto("http://localhost:45691");
+
+    try {
+      await this.appPage.goto(`http://localhost:${this.appPort}`);
+    } catch (e) {
+      this.startApp();
+      return;
+    }
 
     this.appPage.on("error", (err) => {
       this.handlePageErrors(err, "error");
