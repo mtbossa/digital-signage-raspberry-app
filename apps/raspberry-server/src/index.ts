@@ -1,8 +1,6 @@
-import puppeteer from "puppeteer-core";
-
 import app from "./app";
 import logger from "./logger";
-import startApp from "./utils/BrowserController";
+import BrowserController from "./utils/BrowserController";
 
 const port = app.get("port");
 const server = app.listen(port);
@@ -25,7 +23,6 @@ const shouldOpenBrowser = (): boolean => {
 
 if (shouldOpenBrowser()) {
   (async () => {
-    const browserController = await startApp();
-    app.set("browserController", browserController);
+    await BrowserController.startApp();
   })();
 }

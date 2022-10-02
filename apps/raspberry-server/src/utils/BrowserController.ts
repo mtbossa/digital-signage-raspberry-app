@@ -2,52 +2,54 @@ import puppeteer, { Browser, Page } from "puppeteer-core";
 
 import logger from "../logger";
 
-class BrowserController {
-  browser: Browser | null = null;
-  appPage: Page | null = null;
+export default class BrowserController {
+  static browser: Browser | null = null;
+  static appPage: Page | null = null;
   // Since we don't have access to app, we must hardcode the port based on NODE_ENV
   // which must be the same on config files
-  appPort: number = process.env.NODE_ENV === "development" ? 3030 : 45691;
+  static appPort: number = process.env.NODE_ENV === "development" ? 3030 : 45691;
 
-  public async startApp() {
-    if (this.browser && this.browser.isConnected()) {
-      await this.browser.close();
+  static async startApp() {
+    if (BrowserController.browser) {
+      await BrowserController.browser.close();
     }
 
-    this.browser = await this.launchBrowser();
-    await this.openAppPage();
+    BrowserController.browser = await BrowserController.launchBrowser();
+    await BrowserController.openAppPage();
   }
 
-  private async handlePageErrors(error: any, errorType: "error" | "pageerror") {
+  private static async handlePageErrors(error: any, errorType: "error" | "pageerror") {
     logger.error(`error (${errorType}) happen at the page: `, error);
-    this.startApp();
+    BrowserController.startApp();
   }
 
-  public async openAppPage() {
-    if (!this.browser) {
-      this.startApp();
+  private static async openAppPage() {
+    if (!BrowserController.browser) {
+      BrowserController.startApp();
       return;
     }
 
-    this.appPage = await this.browser.newPage();
+    BrowserController.appPage = await BrowserController.browser.newPage();
 
     try {
-      await this.appPage.goto(`http://localhost:${this.appPort}`);
+      await BrowserController.appPage.goto(
+        `http://localhost:${BrowserController.appPort}`
+      );
     } catch (e) {
-      this.startApp();
+      BrowserController.startApp();
       return;
     }
 
-    this.appPage.on("error", (err) => {
-      this.handlePageErrors(err, "error");
+    BrowserController.appPage.on("error", (err) => {
+      BrowserController.handlePageErrors(err, "error");
     });
 
-    this.appPage.on("pageerror", async (pageerr) => {
-      this.handlePageErrors(pageerr, "pageerror");
+    BrowserController.appPage.on("pageerror", async (pageerr) => {
+      BrowserController.handlePageErrors(pageerr, "pageerror");
     });
   }
 
-  public launchBrowser(): Promise<Browser> {
+  private static launchBrowser(): Promise<Browser> {
     // When on Windows, must set the chrome.exe path to the PATH env variable
     const chromePath = process.env.CHROME_PATH ?? "/usr/bin/chromium-browser";
     return new Promise((resolve) => {
@@ -81,10 +83,4 @@ class BrowserController {
       }, 15000);
     });
   }
-}
-
-export default async function startApp() {
-  const browserController = new BrowserController();
-  await browserController.startApp();
-  return browserController;
 }
