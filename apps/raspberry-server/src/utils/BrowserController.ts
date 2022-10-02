@@ -10,8 +10,8 @@ class BrowserController {
   appPort: number = process.env.NODE_ENV === "development" ? 3030 : 45691;
 
   public async startApp() {
-    if (this.browser) {
-      this.browser.close();
+    if (this.browser && this.browser.isConnected()) {
+      await this.browser.close();
     }
 
     this.browser = await this.launchBrowser();
@@ -55,9 +55,12 @@ class BrowserController {
 
       const interval = setInterval(async () => {
         try {
+          // In order to avoid any double browser instances, since we're using setInterval(),
+          // we check if it has been instantiated and return it.
           if (browser) {
             clearInterval(interval);
             resolve(browser);
+            return;
           }
 
           browser = await puppeteer.launch({
@@ -68,6 +71,7 @@ class BrowserController {
             timeout: 10000,
             defaultViewport: null,
           });
+
           clearInterval(interval);
           resolve(browser);
           return;
