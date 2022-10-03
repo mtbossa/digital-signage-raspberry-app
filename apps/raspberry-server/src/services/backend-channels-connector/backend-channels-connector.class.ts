@@ -39,9 +39,9 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
 
     logger.info("Connecting to Laravel WebSocket channels");
 
-    const authorizationToken: string = this.app.get("displayAPIToken");
+    const authorizationToken: string = this.app.get("raspberryAPIToken");
     const apiUrl: string = this.app.get("apiUrl");
-    const displayId: number = this.app.get("displayId");
+    const raspberryId: number = this.app.get("raspberryId");
     const pusherAppCluster: string = this.app.get("pusherAppCluster");
     const pusherAppKey: string = this.app.get("pusherAppKey");
 
@@ -66,7 +66,7 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
       client: pusher,
     });
 
-    const channel: Channel = laravelEcho.private(`App.Models.Display.${displayId}`);
+    const channel: Channel = laravelEcho.private(`App.Models.Raspberry.${raspberryId}`);
 
     channel.notification(async (notification: Notification) => {
       switch (this.getEventName(notification.type)) {
