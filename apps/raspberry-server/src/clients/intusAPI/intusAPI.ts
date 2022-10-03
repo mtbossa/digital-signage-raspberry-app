@@ -9,16 +9,6 @@ interface PostResponse {
   data: Post[];
 }
 
-interface PostExpiredResponse {
-  data: PostExpired[];
-}
-
-export interface PostExpired {
-  post_id: number;
-  media_id: number;
-  canDeleteMedia: boolean;
-}
-
 export type AvailableNotifications = "PostCreated" | "PostDeleted";
 
 export interface Notification {
@@ -79,8 +69,7 @@ export class IntusAPIResponseError extends InternalError {
 }
 
 export class IntusAPI {
-  readonly displayId = process.env["DISPLAY_ID"];
-  readonly apiToken = process.env["DISPLAY_API_TOKEN"];
+  readonly apiToken = process.env["RASPBERRY_API_TOKEN"];
   static apiUrl: string;
 
   constructor(
@@ -120,36 +109,10 @@ export class IntusAPI {
     }
   }
 
-  public async fetchExpiredPosts(): Promise<PostExpired[]> {
-    try {
-      const response = await this.request.get<PostExpiredResponse>(
-        `${IntusAPI.apiUrl}/api/displays/${this.displayId}/posts`,
-        {
-          headers: { Authorization: `Bearer ${this.apiToken}` },
-          params: {
-            fromApp: true,
-            expired: true,
-          },
-        }
-      );
-
-      return response.data.data;
-    } catch (err: unknown) {
-      if (err instanceof Error && HTTPUtil.Request.isRequestError(err)) {
-        const error = HTTPUtil.Request.extractErrorData(err);
-        throw new IntusAPIResponseError(
-          `Error: ${JSON.stringify(error.data)} Code: ${error.status}`
-        );
-      }
-      // Non server (api) errors will fallback to a generic client error
-      throw new ClientRequestError(JSON.stringify(err));
-    }
-  }
-
   public async fetchRaspberryPosts(): Promise<Post[]> {
     try {
       const response = await this.request.get<PostResponse>(
-        `${IntusAPI.apiUrl}/api/displays/${this.displayId}/posts`,
+        `${IntusAPI.apiUrl}/api/raspberry/display/posts`,
         {
           headers: { Authorization: `Bearer ${this.apiToken}` },
         }
