@@ -32,7 +32,6 @@ app.configure(configuration());
 IntusAPI.apiUrl = app.get("apiUrl");
 if (process.env.NODE_ENV === "development") {
   const storagePath = process.cwd();
-  console.log("STORAGE PATH: ", storagePath);
   app.set("nedb", `${storagePath}/data`);
   app.set("medias", `${storagePath}/medias`);
 } else {
