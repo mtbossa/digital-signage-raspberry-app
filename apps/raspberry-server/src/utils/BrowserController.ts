@@ -5,9 +5,8 @@ import logger from "../logger";
 export default class BrowserController {
   static browser: Browser | null = null;
   static appPage: Page | null = null;
-  // Since we don't have access to app, we must hardcode the port based on NODE_ENV
-  // which must be the same on config files
-  static appPort: number = process.env.NODE_ENV === "development" ? 3030 : 45691;
+  // Since we don't have access to app, we must hardcode the port
+  static appPort = 45691;
 
   static async startApp() {
     if (BrowserController.browser) {
