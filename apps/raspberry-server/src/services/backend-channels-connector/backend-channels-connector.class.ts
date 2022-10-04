@@ -1,3 +1,4 @@
+import { NotFound } from "@feathersjs/errors";
 import { Id, NullableId, Paginated, Params, ServiceMethods } from "@feathersjs/feathers";
 import Echo, { Channel } from "laravel-echo";
 import Pusher, { Options } from "pusher-js";
@@ -120,11 +121,24 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
 
     const { post_id, media_id, canDeleteMedia } = notification;
 
+    // This post and media could already be deleted on startup, because the post could be expired,
+    // and when the post is expired, we automatically delete it on post sync (and the media is possible)
     if (canDeleteMedia) {
-      await mediasService.remove(media_id);
+      try {
+        await mediasService.remove(media_id);
+      } catch (e) {
+        if (e instanceof NotFound) {
+          logger.debug("[ handlePostDeleted() ] Media was already deleted on startup");
+        }
+      }
     }
-
-    await postsService.remove(post_id);
+    try {
+      await postsService.remove(post_id);
+    } catch (e) {
+      if (e instanceof NotFound) {
+        logger.debug("[ handlePostDeleted() ] Post was already deleted on startup");
+      }
+    }
   }
 
   private getEventName(laravelEvent: string): AvailableNotifications {
