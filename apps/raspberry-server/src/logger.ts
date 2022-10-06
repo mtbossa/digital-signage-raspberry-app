@@ -46,10 +46,10 @@ if (APP_ENV === "development") {
 
   if (APP_ENV === "staging") {
     const dailyTransport: DailyRotateFile = new DailyRotateFile({
-      filename: `${logsFolder}/errors-%DATE%.log`,
+      filename: `${logsFolder}/daily_log-%DATE%.log`,
       datePattern: "HH",
       maxSize: "100m",
-      level: "error",
+      level: "debug",
       format: format.combine(
         format.errors({ stack: true }),
         format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
@@ -59,7 +59,7 @@ if (APP_ENV === "development") {
     });
 
     logger = createLogger({
-      level: "info",
+      level: "debug",
       format: format.combine(format.errors({ stack: true }), format.json()),
       transports: [
         new transports.Console({
