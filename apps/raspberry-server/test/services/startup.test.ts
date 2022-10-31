@@ -1,4 +1,8 @@
 import app from "../../src/app";
+import intusAPI from "../../src/clients/intusAPI/intusAPI";
+
+jest.mock("../../src/clients/intusAPI/intusAPI");
+const mockedIntusAPI = jest.mocked(intusAPI);
 
 describe("'startup' service", () => {
   afterEach(() => {
@@ -11,6 +15,7 @@ describe("'startup' service", () => {
   });
 
   it("test", async () => {
+    mockedIntusAPI.fetchRaspberryPosts.mockResolvedValue([]);
     const service = app.service("startup");
     expect(await service.create({})).toEqual({});
   });
