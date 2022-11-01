@@ -3,7 +3,6 @@ import intusAPI from "../../src/clients/intusAPI/intusAPI";
 
 jest.mock("../../src/clients/intusAPI/intusAPI");
 const mockedIntusAPI = jest.mocked(intusAPI);
-mockedIntusAPI.fetchRaspberryPosts.mockResolvedValue([]);
 
 describe("'startup' service", () => {
   afterEach(() => {
@@ -16,8 +15,29 @@ describe("'startup' service", () => {
     expect(service).toBeTruthy();
   });
 
-  it("test", async () => {
+  it("should call ShowcaseChecker service create method", async () => {
+    mockedIntusAPI.fetchRaspberryPosts.mockResolvedValue([]);
+
     const service = app.service("startup");
-    expect(await service.create({})).toEqual({});
+    const showcase = app.service("showcase-checker");
+    const spy = jest.spyOn(showcase, "create");
+
+    await service.create({});
+
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it("should call ShowcaseChecker service create method even if sync fails", async () => {
+    mockedIntusAPI.fetchRaspberryPosts.mockRejectedValue(new Error("fail"));
+
+    expect.assertions(1);
+
+    const service = app.service("startup");
+    const showcase = app.service("showcase-checker");
+    const spy = jest.spyOn(showcase, "create");
+
+    await service.create({});
+
+    expect(spy).toHaveBeenCalled();
   });
 });
