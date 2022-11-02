@@ -9,7 +9,7 @@ interface PostResponse {
   data: Post[];
 }
 
-export type AvailableNotifications = "PostCreated" | "PostDeleted";
+export type AvailableNotifications = "PostCreated" | "PostDeleted" | "PostUpdated";
 
 export interface Notification {
   id: string;
@@ -24,6 +24,10 @@ export interface PostDeletedNotification extends Notification {
 }
 
 export interface PostCreatedNotification extends Notification {
+  post: Post;
+}
+
+export interface PostUpdatedNotification extends Notification {
   post: Post;
 }
 

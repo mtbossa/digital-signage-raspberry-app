@@ -12,6 +12,7 @@ import {
   Post,
   PostCreatedNotification,
   PostDeletedNotification,
+  PostUpdatedNotification,
 } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
 import logger from "../../logger";
@@ -77,6 +78,9 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
         case "PostDeleted":
           await this.handlePostDeleted(notification as PostDeletedNotification);
           break;
+        case "PostUpdated":
+          await this.handlePostUpdated(notification as PostUpdatedNotification);
+          break;
       }
     });
 
@@ -138,6 +142,29 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
       if (e instanceof NotFound) {
         logger.debug("[ handlePostDeleted() ] Post was already deleted on startup");
       }
+    }
+  }
+
+  // We don't need to worry about media here, because we can't update the posts media in the backend
+  private async handlePostUpdated(notification: PostUpdatedNotification) {
+    const postsService = this.app.service("posts");
+
+    const { post: postApi } = notification;
+
+    try {
+      const postToUpdate = await postsService.get(postApi.id);
+
+      if (postToUpdate.showing) {
+        postsService.emit("end-post", {
+          _id: postApi.id,
+        });
+      }
+
+      await postsService.update(postApi.id, {
+        ...PostAdapter.fromAPIToLocal(postApi),
+      });
+    } catch (e) {
+      logger.error(`Error while trying to update post: ${e}`);
     }
   }
 
