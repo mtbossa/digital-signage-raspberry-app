@@ -154,6 +154,7 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     try {
       const postToUpdate = await postsService.get(postApi.id);
 
+      // We always end-post if its showing, so next shouldShow call emits with the updated values.
       if (postToUpdate.showing) {
         postsService.emit("end-post", {
           _id: postApi.id,
