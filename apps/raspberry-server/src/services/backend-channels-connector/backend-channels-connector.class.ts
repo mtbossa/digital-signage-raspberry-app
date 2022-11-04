@@ -89,13 +89,10 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     return this.status;
   }
 
-  private async handlePostCreate(notification: PostCreatedNotification) {
+  private async createPost(postApi: Post, mediaApi: Media) {
     const mediasService: Medias = this.app.service("medias");
     const postsService: Posts = this.app.service("posts");
     const showcaseChecker = this.app.service("showcase-checker");
-
-    const postApi = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
-    const mediaApi: Media = postApi.media;
 
     await mediasService.update(
       mediaApi.id,
@@ -117,6 +114,13 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     if (!Array.isArray(newPost)) {
       await showcaseChecker.checkPost(newPost);
     }
+  }
+
+  private async handlePostCreate(notification: PostCreatedNotification) {
+    const postApi = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
+    const mediaApi: Media = postApi.media;
+
+    await this.createPost(postApi, mediaApi);
   }
 
   private async handlePostDeleted(notification: PostDeletedNotification) {
@@ -166,6 +170,9 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
       });
     } catch (e) {
       logger.error(`Error while trying to update post: ${e}`);
+      if (e instanceof NotFound) {
+        this.createPost(postApi, postApi.media);
+      }
     }
   }
 
