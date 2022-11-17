@@ -12,7 +12,9 @@
   "raspberryId": "RASPBERRY_ID",
   "raspberryAPIToken": "RASPBERRY_API_TOKEN",
   "apiUrl": "http://localhost:80",
-  "pusherAppCluster": "sa1",
-  "pusherAppKey": "67f6f5d1618646d3ea95",
+  "pusherAppKey": "PUSHER_APP_KEY",
+  "pusherHost": "PUSHER_HOST",
+  "pusherPort": "PUSHER_PORT",
+  "pusherUseTLS": false,
   "nedb": "../data"
 }

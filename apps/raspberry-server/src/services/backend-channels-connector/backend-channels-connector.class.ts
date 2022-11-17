@@ -41,17 +41,22 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
 
     logger.info("Connecting to Laravel WebSocket channels");
 
+    const raspberryId: number = this.app.get("raspberryId");
     const authorizationToken: string = this.app.get("raspberryAPIToken");
     const apiUrl: string = this.app.get("apiUrl");
-    const raspberryId: number = this.app.get("raspberryId");
-    const pusherAppCluster: string = this.app.get("pusherAppCluster");
+    const wsHost: string = this.app.get("pusherHost");
+    const wsPort: number = this.app.get("pusherPort");
     const pusherAppKey: string = this.app.get("pusherAppKey");
+    const useTLS: boolean = this.app.get("pusherUseTLS");
 
     const options: Options = {
       authEndpoint: `${apiUrl}/api/broadcasting/auth`,
-      forceTLS: true,
-      cluster: pusherAppCluster,
+      forceTLS: useTLS,
+      wsHost: wsHost,
+      wsPort: wsPort,
+      wssPort: wsPort,
       enabledTransports: ["ws", "wss"],
+      disableStats: true,
       auth: {
         headers: {
           Authorization: `Bearer ${authorizationToken}`,
@@ -65,10 +70,13 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
       ...options,
       broadcaster: "pusher",
       key: pusherAppKey,
+      encrypted: true,
       client: pusher,
     });
 
     const channel: Channel = laravelEcho.private(`App.Models.Raspberry.${raspberryId}`);
+
+    channel.error((err: any) => console.log(err));
 
     channel.notification(async (notification: Notification) => {
       switch (this.getEventName(notification.type)) {

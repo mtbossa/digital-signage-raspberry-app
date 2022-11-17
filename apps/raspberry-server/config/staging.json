@@ -3,6 +3,8 @@
   "showcaseCheckTimeout": 10000,
   "port": 45691,
   "apiUrl": "https://mural.revendahost.inf.br",
-  "pusherAppCluster": "sa1",
-  "pusherAppKey": "268c53cabba7b38b270a"
+  "pusherAppKey": "PUSHER_APP_KEY",
+  "pusherHost": "PUSHER_HOST",
+  "pusherPort": "PUSHER_PORT",
+  "pusherUseTLS": true
 }
