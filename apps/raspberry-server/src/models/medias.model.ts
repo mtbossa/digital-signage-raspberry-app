@@ -1,7 +1,10 @@
 import NeDB from "@seald-io/nedb";
+import fs from "fs";
 import path from "path";
 
 import { Application } from "../declarations";
+import logger from "../logger";
+import { restartApp } from "../utils/AppController";
 
 export interface Media {
   _id: number;
@@ -13,10 +16,21 @@ export interface Media {
 
 export default function (app: Application): NeDB<Media> {
   const dbPath = app.get("nedb");
-  const Model = new NeDB({
-    filename: path.join(dbPath, "medias.db"),
-    autoload: true,
-  });
+  const modelPath = path.join(dbPath, "medias.db");
+  let Model: NeDB<Media>;
+  try {
+    Model = new NeDB({
+      filename: modelPath,
+      autoload: true,
+    });
+  } catch (e) {
+    fs.unlink(modelPath, (err) => {
+      if (err) throw err;
+      logger.info(`${modelPath} was deleted because of data corruption`);
+      restartApp();
+    });
+    throw new Error("Data corruption");
+  }
 
   return Model;
 }

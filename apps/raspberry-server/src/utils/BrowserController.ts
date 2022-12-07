@@ -8,6 +8,13 @@ export default class BrowserController {
   // Since we don't have access to app, we must hardcode the port
   static appPort = 45691;
 
+  static async closeBrowser() {
+    if (this.browser) {
+      await this.browser.close();
+      this.browser = null;
+    }
+  }
+
   static async startApp() {
     if (BrowserController.browser) {
       await BrowserController.browser.close();
