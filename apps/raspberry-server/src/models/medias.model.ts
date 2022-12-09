@@ -26,7 +26,7 @@ export default function (app: Application): NeDB<Media> {
   } catch (e) {
     fs.unlink(modelPath, (err) => {
       if (err) throw err;
-      logger.info(`${modelPath} was deleted because of data corruption`);
+      logger.error(`${modelPath} was deleted because of data corruption`);
       restartApp();
     });
     throw new Error("Data corruption");
