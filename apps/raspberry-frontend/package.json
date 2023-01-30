@@ -27,6 +27,7 @@
   "scripts": {
     "dev": "GENERATE_SOURCEMAP=false BROWSER=none react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "rm -rf ../raspberry-server/public && mv ./build ../raspberry-server/public",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

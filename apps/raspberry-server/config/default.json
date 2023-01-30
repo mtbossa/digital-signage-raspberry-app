@@ -1,17 +1,20 @@
 {
   "host": "localhost",
-  "port": 3030,
+  "port": 45691,
   "public": "../public/",
-  "medias": "../public/medias",
+  "medias": "../medias/",
   "paginate": {
     "default": 10,
     "max": 50
   },
-  "serverCheckTimeout": 15000,
+  "serverCheckTimeout": 40000,
   "showcaseCheckTimeout": 5000,
-  "dbName": "DB_NAME",
-  "displayId": "DISPLAY_ID",
-  "displayAPIToken": "DISPLAY_API_TOKEN",
-  "apiUrl": "API_URL",
+  "raspberryId": "RASPBERRY_ID",
+  "raspberryAPIToken": "RASPBERRY_API_TOKEN",
+  "apiUrl": "http://localhost:80",
+  "pusherAppKey": "PUSHER_APP_KEY",
+  "pusherHost": "PUSHER_HOST",
+  "pusherPort": "PUSHER_PORT",
+  "pusherUseTLS": false,
   "nedb": "../data"
 }

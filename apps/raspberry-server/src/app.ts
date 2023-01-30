@@ -10,9 +10,11 @@ import socketio from "@feathersjs/socketio";
 import compress from "compression";
 import cors from "cors";
 import helmet from "helmet";
+import os from "os";
 
 import appHooks from "./app.hooks";
 import channels from "./channels";
+import { IntusAPI } from "./clients/intusAPI/intusAPI";
 import { Application } from "./declarations";
 import logger from "./logger";
 import middleware from "./middleware";
@@ -26,6 +28,19 @@ export type HookContext<T = any> = {
 
 // Load app configuration
 app.configure(configuration());
+
+IntusAPI.apiUrl = app.get("apiUrl");
+if (process.env.NODE_ENV === "development") {
+  const storagePath = process.cwd();
+  app.set("nedb", `${storagePath}/data`);
+  app.set("medias", `${storagePath}/medias`);
+} else {
+  const userHomeDir = os.homedir();
+  const storagePath = path.join(userHomeDir, ".local/", "share/", "intus/");
+  app.set("nedb", `${storagePath}/data`);
+  app.set("medias", `${storagePath}/medias`);
+}
+
 // Enable security, CORS, compression, favicon and body parsing
 app.use(
   helmet({
@@ -36,9 +51,9 @@ app.use(cors());
 app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// Host the public folder
-app.use(express.static(app.get("medias")));
+
 app.use(express.static(app.get("public")));
+app.use("/medias", express.static(path.join(app.get("medias"))));
 
 // Set up Plugins and providers
 app.configure(express.rest());

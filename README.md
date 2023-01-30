@@ -1,82 +1,27 @@
-# Turborepo starter
+# How it works
+<p><i>@intus/raspberry-server</i> package is a FeathersJS WebSocket/HTTP server, and <i>@intus/raspberry-frontend</i> is a React application, which is served by the HTTP server, and communicats with it through the WebSocket server.</p>
 
-This is an official Yarn v1 starter turborepo.
+### Build process:
+>First the server is build to a build/ folder, then the frontend as well, which will copy the built files to the public folder of the server folder. Then, using [`vercel/pkg`](https://github.com/vercel/pkg), the server will be packaged to a binary containing the built frontend and the configuration files used by the server.
 
-## What's inside?
+**MUST**: in order for the build to work, must follow the steps from the [`vercel/pkg`](https://github.com/vercel/pkg) docs, where it says:
+>To be able to generate executables for all supported architectures and platforms, run pkg on a Linux host with binfmt (QEMU emulation) configured and ldid installed.
 
-This turborepo uses [Yarn](https://classic.yarnpkg.com/lang/en/) as a package manager. It includes the following packages/apps:
+So, we can install it using [tonistiigi/binfmt](https://github.com/tonistiigi/binfmt) `arm64` platform and then build.
 
-### Apps and Packages
+## **Atention**
 
-- `docs`: a [Next.js](https://nextjs.org) app
-- `web`: another [Next.js](https://nextjs.org) app
-- `ui`: a stub React component library shared by both `web` and `docs` applications
-- `eslint-config-custom`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
+When building for staging and production, must be sure that all the values inside the config folder are correct, because they'll be used by the packaged application.
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+After build, must push the new build package to the [intus-kiosk-app repository](https://github.com/intuskioskapp/intuskioskapp.git) with key in the correct branch. Eg.: If build for staging, push to staging branch.
 
-### Utilities
+Then, must clone from specif branch.
 
-This turborepo has some additional tools already setup for you:
+# Running the app on Raspberry
+* Production: <br>
+`NODE_ENV=production DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server`
+* Staging: <br>
+`NODE_ENV=staging DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server`
+* Development: <br>
+`NODE_ENV=development DISPLAY_ID=<DISPLAY_ID> DISPLAY_API_TOKEN="<DISPLAY_API_TOKEN>" ./raspberry-server`
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-## Setup
-
-This repository is used in the `npx create-turbo` command, and selected when choosing which package manager you wish to use with your monorepo (Yarn).
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-yarn run build
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-yarn run dev
-```
-
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.org/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Pipelines](https://turborepo.org/docs/core-concepts/pipelines)
-- [Caching](https://turborepo.org/docs/core-concepts/caching)
-- [Remote Caching](https://turborepo.org/docs/core-concepts/remote-caching)
-- [Scoped Tasks](https://turborepo.org/docs/core-concepts/scopes)
-- [Configuration Options](https://turborepo.org/docs/reference/configuration)
-- [CLI Usage](https://turborepo.org/docs/reference/command-line-reference)
-
-Building Dockerfile for production:
-
-yarn build
-docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7  -f Dockerfile.raspberry -t mtbossa/raspberry-prod:staging --push .

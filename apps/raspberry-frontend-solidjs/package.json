@@ -1,0 +1,28 @@
+{
+  "name": "@intus/raspberry-frontend-solidjs",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "postbuild": "rm -rf ../raspberry-server/public && mv ./dist ../raspberry-server/public",
+    "serve": "vite preview"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.8.2",
+    "vite": "^3.0.9",
+    "vite-plugin-solid": "^2.3.0"
+  },
+  "dependencies": {
+    "@feathersjs/client": "^4.5.11",
+    "@feathersjs/feathers": "^4.5.11",
+    "@feathersjs/socketio-client": "^4.5.11",
+    "@intus/raspberry-server": "*",
+    "engine.io-client": "3.5.3",
+    "socket.io-client": "^2.5.0",
+    "solid-js": "^1.5.1"
+  }
+}

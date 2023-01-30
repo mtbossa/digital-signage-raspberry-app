@@ -1,0 +1,10 @@
+{
+  "serverCheckTimeout": 60000,
+  "showcaseCheckTimeout": 10000,
+  "port": 45691,
+  "apiUrl": "https://mural.revendahost.inf.br",
+  "pusherAppKey": "app-key",
+  "pusherHost": "muraldev1.revendahost.inf.br",
+  "pusherPort": 6002,
+  "pusherUseTLS": true
+}

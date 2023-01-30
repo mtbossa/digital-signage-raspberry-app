@@ -1,3 +1,4 @@
+import { NotFound } from "@feathersjs/errors";
 import { Id, NullableId, Paginated, Params, ServiceMethods } from "@feathersjs/feathers";
 import Echo, { Channel } from "laravel-echo";
 import Pusher, { Options } from "pusher-js";
@@ -11,6 +12,7 @@ import {
   Post,
   PostCreatedNotification,
   PostDeletedNotification,
+  PostUpdatedNotification,
 } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
 import logger from "../../logger";
@@ -39,15 +41,22 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
 
     logger.info("Connecting to Laravel WebSocket channels");
 
-    const authorizationToken: string = this.app.get("displayAPIToken");
+    const raspberryId: number = this.app.get("raspberryId");
+    const authorizationToken: string = this.app.get("raspberryAPIToken");
     const apiUrl: string = this.app.get("apiUrl");
-    const displayId: number = this.app.get("displayId");
+    const wsHost: string = this.app.get("pusherHost");
+    const wsPort: number = this.app.get("pusherPort");
+    const pusherAppKey: string = this.app.get("pusherAppKey");
+    const useTLS: boolean = this.app.get("pusherUseTLS");
 
     const options: Options = {
       authEndpoint: `${apiUrl}/api/broadcasting/auth`,
-      forceTLS: true,
-      cluster: "sa1",
+      forceTLS: useTLS,
+      wsHost: wsHost,
+      wsPort: wsPort,
+      wssPort: wsPort,
       enabledTransports: ["ws", "wss"],
+      disableStats: true,
       auth: {
         headers: {
           Authorization: `Bearer ${authorizationToken}`,
@@ -55,22 +64,19 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
       },
     };
 
-    const pusher: Pusher = new Pusher("67f6f5d1618646d3ea95", options);
+    const pusher: Pusher = new Pusher(pusherAppKey, options);
 
     const laravelEcho: Echo = new Echo({
       ...options,
       broadcaster: "pusher",
-      key: "67f6f5d1618646d3ea95",
+      key: pusherAppKey,
+      encrypted: true,
       client: pusher,
-      auth: {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${authorizationToken}`,
-        },
-      },
     });
 
-    const channel: Channel = laravelEcho.private(`App.Models.Display.${displayId}`);
+    const channel: Channel = laravelEcho.private(`App.Models.Raspberry.${raspberryId}`);
+
+    channel.error((err: any) => console.log(err));
 
     channel.notification(async (notification: Notification) => {
       switch (this.getEventName(notification.type)) {
@@ -80,6 +86,9 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
         case "PostDeleted":
           await this.handlePostDeleted(notification as PostDeletedNotification);
           break;
+        case "PostUpdated":
+          await this.handlePostUpdated(notification as PostUpdatedNotification);
+          break;
       }
     });
 
@@ -88,13 +97,10 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     return this.status;
   }
 
-  private async handlePostCreate(notification: PostCreatedNotification) {
+  private async createPost(postApi: Post, mediaApi: Media) {
     const mediasService: Medias = this.app.service("medias");
     const postsService: Posts = this.app.service("posts");
     const showcaseChecker = this.app.service("showcase-checker");
-
-    const postApi = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
-    const mediaApi: Media = postApi.media;
 
     await mediasService.update(
       mediaApi.id,
@@ -118,17 +124,64 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     }
   }
 
+  private async handlePostCreate(notification: PostCreatedNotification) {
+    const postApi = notification.post as Post; // Here we know we have post, since we control the data returned from the backend
+    const mediaApi: Media = postApi.media;
+
+    await this.createPost(postApi, mediaApi);
+  }
+
   private async handlePostDeleted(notification: PostDeletedNotification) {
     const mediasService: Medias = this.app.service("medias");
     const postsService: Posts = this.app.service("posts");
 
     const { post_id, media_id, canDeleteMedia } = notification;
 
+    // This post and media could already be deleted on startup, because the post could be expired,
+    // and when the post is expired, we automatically delete it on post sync (and the media is possible)
     if (canDeleteMedia) {
-      await mediasService.remove(media_id);
+      try {
+        await mediasService.remove(media_id);
+      } catch (e) {
+        if (e instanceof NotFound) {
+          logger.debug("[ handlePostDeleted() ] Media was already deleted on startup");
+        }
+      }
     }
+    try {
+      await postsService.remove(post_id);
+    } catch (e) {
+      if (e instanceof NotFound) {
+        logger.debug("[ handlePostDeleted() ] Post was already deleted on startup");
+      }
+    }
+  }
 
-    await postsService.remove(post_id);
+  // We don't need to worry about media here, because we can't update the posts media in the backend
+  private async handlePostUpdated(notification: PostUpdatedNotification) {
+    const postsService = this.app.service("posts");
+
+    const { post: postApi } = notification;
+
+    try {
+      const postToUpdate = await postsService.get(postApi.id);
+
+      // We always end-post if its showing, so next shouldShow call emits with the updated values.
+      if (postToUpdate.showing) {
+        postsService.emit("end-post", {
+          _id: postApi.id,
+        });
+      }
+
+      await postsService.update(postApi.id, {
+        ...PostAdapter.fromAPIToLocal(postApi),
+      });
+    } catch (e) {
+      logger.error(`Error while trying to update post: ${e}`);
+      if (e instanceof NotFound) {
+        this.createPost(postApi, postApi.media);
+      }
+    }
   }
 
   private getEventName(laravelEvent: string): AvailableNotifications {

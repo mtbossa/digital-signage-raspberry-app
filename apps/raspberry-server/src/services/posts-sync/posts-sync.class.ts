@@ -1,16 +1,9 @@
-import { Params, ServiceAddons, ServiceMethods } from "@feathersjs/feathers";
+import { Params, ServiceMethods } from "@feathersjs/feathers";
 
-import intusAPI, {
-  Media,
-  Post as APIPost,
-  PostExpired,
-} from "../../clients/intusAPI/intusAPI";
+import intusAPI, { Media, Post as APIPost } from "../../clients/intusAPI/intusAPI";
 import { Application } from "../../declarations";
 import logger from "../../logger";
 import { Post } from "../../models/posts.model";
-import { MediaPosts } from "../media-posts/media-posts.class";
-import { Medias } from "../medias/medias.class";
-import { Posts } from "../posts/posts.class";
 
 interface Data {}
 

@@ -36,6 +36,7 @@ export class ServerStatusChecker implements Pick<ServiceMethods<Data>, "create">
   app: Application;
   options: ServiceOptions;
   status: { server: "up" | "down" } = { server: "up" };
+  interval: NodeJS.Timer | null = null;
 
   private requestTimeout: number;
 
@@ -56,7 +57,7 @@ export class ServerStatusChecker implements Pick<ServiceMethods<Data>, "create">
     const channelsConnectorService = this.app.service("backend-channels-connector");
 
     logger.info("Starting Server Status Checker");
-    setInterval(async () => {
+    this.interval = setInterval(async () => {
       try {
         logger.info("Checking server status");
         await this.check();
@@ -84,5 +85,9 @@ export class ServerStatusChecker implements Pick<ServiceMethods<Data>, "create">
     }, this.requestTimeout);
 
     return data;
+  }
+
+  async stop() {
+    if (this.interval) clearInterval(this.interval);
   }
 }

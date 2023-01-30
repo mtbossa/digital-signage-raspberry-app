@@ -1,3 +1,6 @@
 {
-  "serverCheckTimeout": 10000
+  "serverCheckTimeout": 10000,
+  "public": "../public/",
+  "medias": "../medias/",
+  "nedb": "../data"
 }

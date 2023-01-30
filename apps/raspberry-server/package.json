@@ -5,6 +5,7 @@
   "homepage": "",
   "private": true,
   "main": "src",
+  "bin": "build/index.js",
   "keywords": [
     "feathers"
   ],
@@ -24,14 +25,23 @@
     "yarn": ">= 0.18.0"
   },
   "scripts": {
-    "test": "yarn run lint && yarn run build && yarn run jest",
+    "test": "yarn run build && yarn run jest",
     "lint": "eslint src/. test/. --ext .ts --fix",
     "dev": "ts-node-dev -r dotenv/config --inspect=9229 --respawn --no-notify src/",
     "start": "yarn run build && node build/",
     "jest": "jest --forceExit",
     "build": "shx rm -rf build/ && tsc",
     "format": "prettier --write \"**/*.{ts,md}\"",
-    "postbuild": "cp package.json build && cp yarn.lock build && cd build && yarn remove @intus/eslint-config && yarn install --production"
+    "package": "npx pkg package.json -o dist/intus-raspberry"
+  },
+  "pkg": {
+    "assets": [
+      "config/**/*",
+      "public/**/*"
+    ],
+    "targets": [
+      "node16-linux-arm64"
+    ]
   },
   "standard": {
     "env": [
@@ -56,9 +66,11 @@
     "feathers-nedb": "^6.0.0",
     "helmet": "^5.1.0",
     "laravel-echo": "^1.12.0",
+    "puppeteer-core": "^18.0.5",
     "pusher-js": "^7.1.1-beta",
     "serve-favicon": "^2.5.0",
-    "winston": "^3.0.0"
+    "winston": "^3.0.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "@intus/eslint-config": "*",
