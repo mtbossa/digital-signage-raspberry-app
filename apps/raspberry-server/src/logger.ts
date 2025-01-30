@@ -44,51 +44,34 @@ if (APP_ENV === "development") {
   const userHomeDir = os.homedir();
   const logsFolder = path.join(userHomeDir, ".local/", "share/", "intus/logs");
 
-  if (APP_ENV === "staging") {
-    const dailyTransport: DailyRotateFile = new DailyRotateFile({
-      filename: `${logsFolder}/daily_log-%DATE%.log`,
-      datePattern: "HH",
-      maxSize: "100m",
-      level: "debug",
-      format: format.combine(
-        format.errors({ stack: true }),
-        format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
-        format.json()
-      ),
-      handleExceptions: true,
-    });
+  const dailyTransport: DailyRotateFile = new DailyRotateFile({
+    filename: `${logsFolder}/daily_log-%DATE%.log`,
+    datePattern: "HH",
+    maxSize: "100m",
+    level: "debug",
+    format: format.combine(
+      format.errors({ stack: true }),
+      format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" }),
+      format.json()
+    ),
+    handleExceptions: true,
+  });
 
-    logger = createLogger({
-      level: "debug",
-      format: format.combine(format.errors({ stack: true }), format.json()),
-      transports: [
-        new transports.Console({
-          format: format.combine(
-            format.colorize(),
-            format.simple(),
-            format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" })
-          ),
-          handleExceptions: true,
-        }),
-        dailyTransport,
-      ],
-    });
-  } else {
-    logger = createLogger({
-      level: "error",
-      format: format.combine(format.errors({ stack: true }), format.json()),
-      transports: [
-        new transports.Console({
-          format: format.combine(
-            format.colorize(),
-            format.simple(),
-            format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" })
-          ),
-          handleExceptions: true,
-        }),
-      ],
-    });
-  }
+  logger = createLogger({
+    level: "debug",
+    format: format.combine(format.errors({ stack: true }), format.json()),
+    transports: [
+      new transports.Console({
+        format: format.combine(
+          format.colorize(),
+          format.simple(),
+          format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" })
+        ),
+        handleExceptions: true,
+      }),
+      dailyTransport,
+    ],
+  });
 }
 
 export default logger;
