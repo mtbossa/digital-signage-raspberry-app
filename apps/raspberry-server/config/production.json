@@ -2,9 +2,10 @@
   "serverCheckTimeout": 60000,
   "showcaseCheckTimeout": 10000,
   "port": 45691,
-  "apiUrl": "http://192.168.0.108",
+  "apiUrl": "API_URL",
   "pusherAppKey": "PUSHER_APP_KEY",
   "pusherHost": "PUSHER_HOST",
   "pusherPort": "PUSHER_PORT",
+  "pusherCluster": "PUSHER_CLUSTER",
   "pusherUseTLS": true
 }

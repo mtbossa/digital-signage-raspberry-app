@@ -47,6 +47,7 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     const wsHost: string = this.app.get("pusherHost");
     const wsPort: number = this.app.get("pusherPort");
     const pusherAppKey: string = this.app.get("pusherAppKey");
+    const pusherCluster: string = this.app.get("pusherCluster");
     const useTLS: boolean = this.app.get("pusherUseTLS");
 
     const options: Options = {
@@ -55,6 +56,7 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
       wsHost: wsHost,
       wsPort: wsPort,
       wssPort: wsPort,
+      cluster: pusherCluster,
       enabledTransports: ["ws", "wss"],
       disableStats: true,
       auth: {
