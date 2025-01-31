@@ -44,20 +44,13 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     const raspberryId: number = this.app.get("raspberryId");
     const authorizationToken: string = this.app.get("raspberryAPIToken");
     const apiUrl: string = this.app.get("apiUrl");
-    const wsHost: string = this.app.get("pusherHost");
-    const wsPort: number = this.app.get("pusherPort");
     const pusherAppKey: string = this.app.get("pusherAppKey");
     const pusherCluster: string = this.app.get("pusherCluster");
-    const useTLS: boolean = this.app.get("pusherUseTLS");
 
     const options: Options = {
       authEndpoint: `${apiUrl}/api/broadcasting/auth`,
-      forceTLS: useTLS,
-      wsHost: wsHost,
-      wsPort: wsPort,
-      wssPort: wsPort,
+      forceTLS: true,
       cluster: pusherCluster,
-      enabledTransports: ["ws", "wss"],
       disableStats: true,
       auth: {
         headers: {
@@ -81,6 +74,8 @@ export class BackendChannelsConnector implements Pick<ServiceMethods<Data>, "cre
     channel.error((err: any) => console.log(err));
 
     channel.notification(async (notification: Notification) => {
+      console.log("Received notification: ", notification);
+
       switch (this.getEventName(notification.type)) {
         case "PostCreated":
           await this.handlePostCreate(notification as PostCreatedNotification);

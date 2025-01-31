@@ -1,5 +1,5 @@
 {
   "apiUrl": "API_URL",
-  "pusherAppCluster": "PUSHER_CLUSTER",
+  "pusherCluster": "PUSHER_CLUSTER",
   "pusherAppKey": "PUSHER_APP_KEY"
 }
